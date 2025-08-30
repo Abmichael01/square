@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/style.css" />
+</head>
+<body>
+    <!-- Loading Spinner -->
+    <div id="loading-spinner">
+        <div class="spinner"></div>
+        <div class="loading-text">Loading User Dashboard</div>
+    </div>
+    
+    <!-- Main Content (initially hidden) -->
+    <div class="content">
+        <!-- User Dashboard -->
+        <div id="user-dashboard">
+            <header class="header">
+                <div class="header-container">
+                    <a href="#" class="logo">
+                        <i class="fas fa-user-circle logo-icon"></i>
+                        <span>User Portal</span>
+                    </a>
+                    <div class="user-info">
+                        Welcome, <span id="user-name">John Doe</span>!
+                    </div>
+                </div>
+            </header>
+            
+            <main class="main">
+                <div class="dashboard-container">
+                    <div class="dashboard-header">
+                        <h1 class="dashboard-title">User Dashboard</h1>
+                        <p class="dashboard-subtitle">Manage your account and view your information</p>
+                    </div>
+                    
+                    <div class="dashboard-menu">
+                        <div class="menu-item active" data-target="home">Home</div>
+                        <div class="menu-item" data-target="profile">My Profile</div>
+                        <div class="menu-item" id="sign-out-btn">Sign Out</div>
+                    </div>
+                    
+                    <div class="dashboard-content">
+                        <div id="home-section" class="content-section active">
+                            <h2>Dashboard Overview</h2>
+                            <p>Welcome to your personal dashboard. Here you can manage your account settings and view your personal information.</p>
+                            
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <div class="stat-value">12</div>
+                                    <div class="stat-label">Tasks Completed</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value">7</div>
+                                    <div class="stat-label">Projects Active</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value">94%</div>
+                                    <div class="stat-label">Profile Complete</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value">28</div>
+                                    <div class="stat-label">Achievements</div>
+                                </div>
+                            </div>
+                            
+                            <div class="recent-activity">
+                                <h3>Recent Activity</h3>
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <i class="fas fa-tasks"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <p><strong>Completed task "Quarterly Report"</strong></p>
+                                        <p>2 hours ago</p>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <i class="fas fa-user-check"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <p><strong>Updated profile information</strong></p>
+                                        <p>Yesterday</p>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <i class="fas fa-project-diagram"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <p><strong>Started new project "Website Redesign"</strong></p>
+                                        <p>3 days ago</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="profile-section" class="content-section">
+                            <h2>My Profile</h2>
+                            <div class="profile-info">
+                                <div class="profile-picture">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="profile-details">
+                                    <div class="detail-item">
+                                        <span class="detail-label">Full Name:</span>
+                                        <span class="detail-value">John Doe</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Email:</span>
+                                        <span class="detail-value">user@example.com</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Member since:</span>
+                                        <span class="detail-value">January 15, 2023</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Department:</span>
+                                        <span class="detail-value">Marketing</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Position:</span>
+                                        <span class="detail-value">Content Manager</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Status:</span>
+                                        <span class="detail-value">Active</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 32px;">
+                                <h3>Account Settings</h3>
+                                <p>Update your account preferences and security settings.</p>
+                                <div style="display: flex; gap: 12px; margin-top: 16px;">
+                                    <button class="login-button" style="width: auto;">Edit Profile</button>
+                                    <button class="signup-button" style="width: auto;">Change Password</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <footer class="footer">
+                <div class="footer-links">
+                    <a href="#" class="footer-link">Privacy Policy</a>
+                    <a href="#" class="footer-link">Terms of Service</a>
+                    <a href="#" class="footer-link">Help Center</a>
+                    <a href="#" class="footer-link">Contact Support</a>
+                </div>
+                <p class="copyright">© 2023 User Portal. Educational Demo</p>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simulate loading delay (3 seconds)
+            setTimeout(function() {
+                const loadingSpinner = document.getElementById('loading-spinner');
+                const content = document.querySelector('.content');
+                
+                // Fade out the spinner
+                loadingSpinner.style.opacity = '0';
+                
+                // Show the content
+                content.style.display = 'block';
+                
+                // Remove spinner from DOM after fade out
+                setTimeout(function() {
+                    loadingSpinner.style.display = 'none';
+                }, 500);
+            }, 3000);
+            
+            // Dashboard menu functionality
+            document.querySelectorAll('.menu-item[data-target]').forEach(item => {
+                item.addEventListener('click', function() {
+                    const target = this.getAttribute('data-target');
+                    
+                    // Update active menu item
+                    this.parentElement.querySelectorAll('.menu-item').forEach(i => {
+                        i.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    
+                    // Show corresponding content section
+                    const container = this.closest('.dashboard-container');
+                    container.querySelectorAll('.content-section').forEach(section => {
+                        section.classList.remove('active');
+                    });
+                    container.querySelector(`#${target}-section`).classList.add('active');
+                });
+            });
+            
+            // Sign out functionality
+            document.getElementById('sign-out-btn').addEventListener('click', function() {
+                if (confirm('Are you sure you want to sign out?')) {
+                    alert('You have been signed out. In a real application, this would redirect to the login page.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

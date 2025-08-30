@@ -1,0 +1,29 @@
+[project]
+name = "damibrother"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Urkelcodes",email = "abmichael109@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12,<4.0"
+dependencies = [
+    "django (>=5.2.5,<6.0.0)",
+    "whitenoise (>=6.9.0,<7.0.0)",
+    "python-dotenv (>=1.1.1,<2.0.0)",
+    "django-browser-reload (>=1.18.0,<2.0.0)",
+    "django-tailwind (>=4.2.0,<5.0.0)",
+    "django-compressor (>=4.5.1,<5.0.0)",
+    "django-appconf (>=1.1.0,<2.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.dev.dependencies]
+djlint = "^1.36.4"
+black = "^25.1.0"
+isort = "^6.0.1"
+
