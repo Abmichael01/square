@@ -44,12 +44,23 @@ def home(request):
         cache_key = f"pwd_reset_otp:{email.lower()}"
         cache.set(cache_key, otp, timeout=10 * 60)  # 10 minutes
 
-        send_mail(
-            subject="Your password reset code",
-            message=f"Your OTP is {otp}. It expires in 10 minutes.",
-            from_email=None,
-            recipient_list=[email],
-        )
+        try:
+            send_mail(
+                subject="Your password reset code",
+                message=f"Your OTP is {otp}. It expires in 10 minutes.",
+                from_email=None,  # Uses DEFAULT_FROM_EMAIL from settings
+                recipient_list=[email],
+                fail_silently=False,  # Raise exceptions on failure
+            )
+        except Exception as e:
+            print(f"Email sending failed: {e}")
+            messages.error(request, "Failed to send email. Please try again.")
+            if request.headers.get("HX-Request"):
+                resp = HttpResponse(status=500)
+                resp["X-Toast-Message"] = "Failed to send email. Please try again."
+                resp["X-Toast-Type"] = "error"
+                return resp
+            return redirect("home")
         messages.success(request, "OTP sent to your email.")
         next_url = f"{reverse('reset_password')}?email={email}"
         if request.headers.get("HX-Request"):
