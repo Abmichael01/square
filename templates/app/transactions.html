@@ -1,0 +1,76 @@
+{% extends 'app/dashboard_layout.html' %}
+{% load static %}
+
+{% block dashboard_content %}
+<div class="transactions-page">
+    <div class="transactions-header">
+        <h1>Transaction History</h1>
+        <p>View and manage your account transactions</p>
+    </div>
+    
+    <div class="transactions-content">
+        <div class="transactions-filters">
+            <div class="filter-group">
+                <label>Filter by:</label>
+                <select class="filter-select">
+                    <option value="all">All Transactions</option>
+                    <option value="deposits">Deposits</option>
+                    <option value="withdrawals">Withdrawals</option>
+                    <option value="payments">Payments</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Date Range:</label>
+                <select class="filter-select">
+                    <option value="all">All Time</option>
+                    <option value="today">Today</option>
+                    <option value="week">This Week</option>
+                    <option value="month">This Month</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="transactions-list">
+            {% if transactions %}
+                {% for transaction in transactions %}
+                <div class="transaction-item">
+                    <div class="transaction-icon {{ transaction.icon_class }}">
+                        <i class="{{ transaction.icon }}"></i>
+                    </div>
+                    <div class="transaction-details">
+                        <div class="transaction-title">{{ transaction.title }}</div>
+                        <div class="transaction-description">{{ transaction.description }}</div>
+                        <div class="transaction-date">{{ transaction.date|date:"M d, Y g:i A" }}</div>
+                    </div>
+                    <div class="transaction-amount {% if transaction.status == 'approved' %}positive{% else %}negative{% endif %}">
+                        {% if transaction.status == 'approved' %}+{% else %}-{% endif %}${{ transaction.amount|floatformat:2 }}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-transactions">
+                    <div class="no-transactions-icon">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                    <h3>No Transactions Yet</h3>
+                    <p>Your transaction history will appear here once you make payments or transfers.</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="transactions-pagination">
+            <button class="pagination-btn" disabled>
+                <i class="fas fa-chevron-left"></i>
+                Previous
+            </button>
+            <div class="pagination-info">
+                Showing 1-6 of 24 transactions
+            </div>
+            <button class="pagination-btn">
+                Next
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}

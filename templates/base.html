@@ -1,18 +1,107 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}SquarePR{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
+    <!-- Base styles -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}" />
+    <!-- Page-specific styles -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/auth.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/dashboard_layout.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/dashboard.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/profile.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/transactions.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/payment.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/card.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/components.css' %}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     {% block head %}{% endblock %}
     
 </head>
 <body>
     {% block content %}{% endblock %}
+    {% include 'partials/footer.html' %}
+    <script>
+    // Show any persisted toast from previous redirect, then clear it
+    (function(){
+        try {
+            var pending = sessionStorage.getItem('pendingToast');
+            if (pending && window.Toastify) {
+                var p = JSON.parse(pending);
+                Toastify({ text: p.text, gravity: 'top', position: 'right', duration: p.duration || 3000, style: { background: p.bg || '#006aff', color: p.color || '#fff', borderRadius: '8px' } }).showToast();
+                sessionStorage.removeItem('pendingToast');
+            }
+        } catch (e) { /* noop */ }
+    })();
+
+    // Add loading state to submit buttons for all htmx requests
+    function setButtonLoading(form, isLoading) {
+        if (!form) return;
+        var btn = form.querySelector('[type="submit"]');
+        if (!btn) return;
+        if (isLoading) {
+            if (!btn.dataset.originalText) btn.dataset.originalText = btn.textContent;
+            btn.classList.add('is-loading');
+            btn.setAttribute('disabled', 'disabled');
+        } else {
+            btn.classList.remove('is-loading');
+            btn.removeAttribute('disabled');
+        }
+    }
+
+    document.addEventListener('htmx:beforeRequest', function (evt) {
+        var elt = evt.target;
+        var form = elt.closest ? elt.closest('form') : null;
+        if (!form && elt.tagName === 'FORM') form = elt;
+        setButtonLoading(form, true);
+    });
+
+    function clearLoading(evt){
+        var elt = evt.target;
+        var form = elt.closest ? elt.closest('form') : null;
+        if (!form && elt.tagName === 'FORM') form = elt;
+        setButtonLoading(form, false);
+    }
+    document.addEventListener('htmx:afterOnLoad', clearLoading);
+    document.addEventListener('htmx:responseError', clearLoading);
+
+    // Toast + redirect handling for HTMX responses
+    document.addEventListener('htmx:afterRequest', function (evt) {
+        try {
+            var xhr = evt.detail && evt.detail.xhr ? evt.detail.xhr : null;
+            if (!xhr) return;
+            var redirectTo = xhr.getResponseHeader('HX-Redirect');
+            var toastMsg = xhr.getResponseHeader('X-Toast-Message');
+            var toastType = xhr.getResponseHeader('X-Toast-Type') || 'info';
+            var bgOverride = xhr.getResponseHeader('X-Toast-Bg');
+            var colorOverride = xhr.getResponseHeader('X-Toast-Color') || '#fff';
+            var durationHeader = xhr.getResponseHeader('X-Toast-Duration');
+            var duration = durationHeader ? parseInt(durationHeader, 10) : 3000;
+            var bg = '#006aff';
+            if (toastType === 'error') bg = '#e52527';
+            if (toastType === 'success') bg = '#16a34a';
+            if (toastType === 'warning') bg = '#f59e0b';
+            if (bgOverride) bg = bgOverride;
+
+            if (toastMsg && redirectTo) {
+                // Persist toast across redirect
+                sessionStorage.setItem('pendingToast', JSON.stringify({ text: toastMsg, bg: bg, color: colorOverride, duration: duration }));
+                return; // htmx will navigate
+            }
+            if (toastMsg && window.Toastify) {
+                Toastify({ text: toastMsg, gravity: 'top', position: 'right', duration: duration, style: { background: bg, color: colorOverride, borderRadius: '8px' } }).showToast();
+            }
+        } catch (e) { /* noop */ }
+    });
+    </script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

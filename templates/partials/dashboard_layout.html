@@ -1,0 +1,64 @@
+{% load static %}
+<!-- Loading Spinner -->
+<div id="loading-spinner">
+    <div class="spinner"></div>
+    <div class="loading-text">{{ loading_text|default:"Loading..." }}</div>
+</div>
+<!-- Main Content (initially hidden) -->
+<div class="content">
+    <!-- User Dashboard -->
+    <div id="user-dashboard">
+        <header class="header">
+            <div class="header-container">
+                <a href="#" class="logo">
+                    <i class="fas fa-user-circle logo-icon"></i>
+                    <span>User Portal</span>
+                </a>
+                <div class="user-info">
+                    Welcome, <span id="user-name">{{ user.email }}</span>!
+                </div>
+            </div>
+        </header>
+        <main class="main{% if narrow %} form-narrow{% endif %}">
+            <div class="dashboard-container">
+                <div class="dashboard-header">
+                    <h1 class="dashboard-title">{{ page_title }}</h1>
+                    <p class="dashboard-subtitle">{{ page_subtitle }}</p>
+                </div>
+                <div class="dashboard-content{% if narrow %} {% else %} form-narrow{% endif %}">
+                    {% if back_url %}
+                    <div class="back-button-container">
+                        <a href="{% url back_url %}" class="back-button">
+                            <i class="fas fa-arrow-left"></i>
+                            {{ back_text|default:"Back to Dashboard" }}
+                        </a>
+                    </div>
+                    {% endif %}
+                    
+                    {% block dashboard_content %}
+                    <!-- Page-specific content goes here -->
+                    {% endblock %}
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Loading spinner
+    setTimeout(function() {
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const content = document.querySelector('.content');
+        loadingSpinner.style.opacity = '0';
+        content.style.display = 'block';
+        setTimeout(function() {
+            loadingSpinner.style.display = 'none';
+        }, 500);
+    }, 1000);
+    
+    {% block dashboard_scripts %}
+    <!-- Page-specific scripts go here -->
+    {% endblock %}
+});
+</script>

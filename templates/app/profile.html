@@ -1,0 +1,115 @@
+{% extends 'app/dashboard_layout.html' %}
+{% load static %}
+
+{% block dashboard_content %}
+<div class="profile-page">
+    <div class="profile-header">
+        <h1>My Profile</h1>
+        <p>Manage your account information and settings</p>
+    </div>
+    
+    <div class="profile-content">
+        <div class="profile-card">
+            <div class="profile-avatar-section">
+                <div class="profile-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="profile-basic-info">
+                    <h2>{{ user.profile.full_name|default:"Not provided" }}</h2>
+                    <p>{{ user.email }}</p>
+                    <div class="profile-status">
+                        {% if user.profile.is_activated %}
+                            <span class="status-badge active">Activated</span>
+                        {% else %}
+                            <span class="status-badge pending">Pending Activation</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="profile-details">
+                <div class="detail-section">
+                    <h3>Personal Information</h3>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <label>Full Name</label>
+                            <span>{{ user.profile.full_name|default:"Not provided" }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Email</label>
+                            <span>{{ user.email }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Phone Number</label>
+                            <span>{{ user.profile.phone_number|default:"Not provided" }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Date of Birth</label>
+                            <span>{{ user.profile.dob|date:"F j, Y"|default:"Not provided" }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Member Since</label>
+                            <span>{{ user.date_joined|date:"F j, Y" }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Card Design</label>
+                            <span>{{ user.profile.card_design|title|default:"White" }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h3>Account Status</h3>
+                    <div class="status-info">
+                        {% if user.profile.is_activated %}
+                            <div class="status-item success">
+                                <i class="fas fa-check-circle"></i>
+                                <div>
+                                    <h4>Account Activated</h4>
+                                    <p>Your account is fully activated and ready to use.</p>
+                                </div>
+                            </div>
+                        {% else %}
+                            {% if user.profile.full_name %}
+                                {% if payment_status == 'pending' %}
+                                    <div class="status-item warning">
+                                        <i class="fas fa-hourglass-half"></i>
+                                        <div>
+                                            <h4>Payment Pending</h4>
+                                            <p>Your payment is being processed. Please wait for admin approval.</p>
+                                        </div>
+                                    </div>
+                                {% elif payment_status == 'rejected' %}
+                                    <div class="status-item error">
+                                        <i class="fas fa-times-circle"></i>
+                                        <div>
+                                            <h4>Payment Rejected</h4>
+                                            <p>Your payment was rejected. Please try a different payment method.</p>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="status-item info">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        <div>
+                                            <h4>Payment Required</h4>
+                                            <p>Your KYC is complete. Please complete payment to activate your card.</p>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% else %}
+                                <div class="status-item info">
+                                    <i class="fas fa-info-circle"></i>
+                                    <div>
+                                        <h4>Activation Required</h4>
+                                        <p>Complete your profile and activate your card to access all features.</p>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

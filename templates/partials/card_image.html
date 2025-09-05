@@ -1,0 +1,37 @@
+<div class="card-image-wrap">
+    <div class="cc-card cc-card--light">
+        <div class="cc-row cc-top">
+            <div class="cc-title">SQUARE</div>
+            <div class="cc-bank">BANK</div>
+        </div>
+        <div class="cc-row cc-diagonals">
+            <span class="cc-line cc-l1"></span>
+            <span class="cc-line cc-l2"></span>
+            <span class="cc-line cc-l3"></span>
+        </div>
+        <div class="cc-row" style="margin-top: 6px;">
+            <div class="cc-chip"></div>
+        </div>
+        <div class="cc-number">
+            {% if profile.card_number %}
+                {{ profile.card_number|slice:":4" }}&nbsp;{{ profile.card_number|slice:"4:8" }}&nbsp;{{ profile.card_number|slice:"8:12" }}&nbsp;{{ profile.card_number|slice:"12:16" }}
+            {% else %}
+                ••••&nbsp;••••&nbsp;••••&nbsp;••••
+            {% endif %}
+        </div>
+        <div class="cc-row cc-details">
+            <div class="cc-valid">
+                <div class="cc-valid-label">valid thru</div>
+                <div class="cc-valid-date">{{ profile.card_expiry|default:"••/••" }}</div>
+            </div>
+        </div>
+        <div class="cc-row cc-bottom">
+            <div class="cc-name">{{ profile.full_name|upper|default:"CARD HOLDER" }}</div>
+            <div class="cc-brand">
+                <span class="cc-diamond cc-d1"></span>
+                <span class="cc-diamond cc-d2"></span>
+            </div>
+        </div>
+        <div class="cc-dots"></div>
+    </div>
+</div>

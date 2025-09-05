@@ -41,7 +41,7 @@
                     <label for="password" class="form-label">Password</label>
                     <div class="input-group">
                         <input type="password" id="password" class="form-input" placeholder="Enter your password" required>
-                        <button title="Toggle Password Visibility" type="button" class="toggle-password" id="toggle-password">
+                        <button type="button" class="toggle-password" id="toggle-password">
                             <i class="far fa-eye"></i>
                         </button>
                     </div>

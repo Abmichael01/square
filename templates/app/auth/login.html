@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+    <header class="header">
+        <div class="header-container">
+            <a href="/" class="logo">
+                <i class="fas fa-user-circle logo-icon"></i>
+                <span>Login</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="login-container">
+            <div class="login-header">
+                <h1 class="login-title">Welcome back</h1>
+                <p class="login-subtitle">Log in with your email and password</p>
+            </div>
+
+            <form method="post" hx-post="{% url 'login' %}" hx-swap="none">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" id="email" name="email" class="form-input" placeholder="name@company.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <div class="input-group">
+                        <input type="password" id="password" name="password" class="form-input" placeholder="Enter your password" required>
+                        <button title="Toggle Password Visibility" type="button" class="toggle-password" id="toggle-password">
+                            <i class="far fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="login-button">Log in</button>
+            </form>
+        </div>
+    </main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const togglePasswordButton = document.getElementById('toggle-password');
+    const passwordInput = document.getElementById('password');
+    if (togglePasswordButton && passwordInput) {
+        togglePasswordButton.addEventListener('click', function() {
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                togglePasswordButton.innerHTML = '<i class="far fa-eye-slash"></i>';
+            } else {
+                passwordInput.type = 'password';
+                togglePasswordButton.innerHTML = '<i class="far fa-eye"></i>';
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
+
+

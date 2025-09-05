@@ -1,0 +1,88 @@
+{% extends 'app/dashboard_layout.html' %}
+{% load static %}
+
+{% block title %}Bitcoin Payment{% endblock %}
+
+{% block dashboard_content %}
+    <div class="payment-page">
+        <div class="payment-header">
+            <div class="back-button-container">
+                <a href="{% url 'payment_selection' %}?type={{ payment_type }}" class="back-button">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Payment Methods
+                </a>
+            </div>
+            <h1>Bitcoin Payment</h1>
+            <p>Complete your {{ payment_type|title }} using Bitcoin.</p>
+        </div>
+        
+        <div class="payment-content">
+            <div class="payment-form">
+                <div class="bitcoin-payment-info">
+                    <div class="payment-icon">
+                        <i class="fab fa-bitcoin"></i>
+                    </div>
+                    <h3>Bitcoin Payment</h3>
+                    <p>Scan the QR code below to complete your payment</p>
+                </div>
+                
+                <div class="qr-code-container">
+                    <img src="{% static 'images/btc.webp' %}" alt="Bitcoin QR Code" class="qr-code" />
+                </div>
+                
+                <div class="bitcoin-address">
+                    <label class="form-label">Bitcoin Address:</label>
+                    <div class="address-input-group">
+                        <input type="text" class="form-input" value="1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa" readonly />
+                        <button class="copy-button" onclick="copyAddress()">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="payment-amount">
+                    <label class="form-label">Amount to Send:</label>
+                    <div class="amount-display">
+                        <span class="amount-value">0.001 BTC</span>
+                        <span class="amount-usd">≈ $50.00 USD</span>
+                    </div>
+                </div>
+                
+                <form method="post" hx-post="{% url 'bitcoin_payment' %}" hx-swap="none">
+                    {% csrf_token %}
+                    <input type="hidden" name="payment_type" value="{{ payment_type }}">
+                    <input type="hidden" name="transaction_hash" id="transaction-hash">
+                    
+                    <div class="form-group">
+                        <label class="form-label">Transaction Hash (Optional)</label>
+                        <input type="text" class="form-input" name="transaction_hash" placeholder="Enter your Bitcoin transaction hash" />
+                    </div>
+                    
+                    <button type="submit" class="login-button">
+                        <i class="fas fa-check"></i>
+                        Confirm Payment
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function copyAddress() {
+    const addressInput = document.querySelector('.address-input-group input');
+    addressInput.select();
+    document.execCommand('copy');
+    
+    Toastify({
+        text: "Bitcoin address copied to clipboard!",
+        duration: 3000,
+        gravity: "top",
+        position: "right",
+        backgroundColor: "#28a745",
+        stopOnFocus: true
+    }).showToast();
+}
+</script>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends 'app/dashboard_layout.html' %}
+{% load static %}
+
+{% block title %}Select Payment Method{% endblock %}
+
+{% block dashboard_content %}
+    <div class="payment-page">
+        <div class="payment-header">
+            <div class="back-button-container">
+                <a href="{% url 'payment_selection' %}" class="back-button">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Withdrawal Options
+                </a>
+            </div>
+            <h1>Select Payment Method</h1>
+            <p>Choose how you want to fund your {% if withdraw_type == 'bank' %}bank withdrawal{% else %}virtual card{% endif %}.</p>
+        </div>
+        
+        <div class="payment-content">
+            <div class="payment-methods-grid">
+                <!-- Bank Transfer -->
+                <a href="{% url 'bank_manual_payment' %}?type={{ withdraw_type }}" class="payment-method-card">
+                    <div class="payment-icon">
+                        <i class="fas fa-university"></i>
+                    </div>
+                    <h3>Bank Transfer</h3>
+                    <p>Connect your bank account securely</p>
+                    <div class="payment-features">
+                        <span class="feature-tag">Secure</span>
+                        <span class="feature-tag">Fast</span>
+                    </div>
+                </a>
+                
+                <!-- Bitcoin -->
+                <a href="{% url 'bitcoin_payment' %}?type={{ withdraw_type }}" class="payment-method-card">
+                    <div class="payment-icon">
+                        <i class="fab fa-bitcoin"></i>
+                    </div>
+                    <h3>Bitcoin</h3>
+                    <p>Pay with cryptocurrency</p>
+                    <div class="payment-features">
+                        <span class="feature-tag">Crypto</span>
+                        <span class="feature-tag">Decentralized</span>
+                    </div>
+                </a>
+                
+                <!-- Gift Card -->
+                <a href="{% url 'gift_card_payment' %}?type={{ withdraw_type }}" class="payment-method-card">
+                    <div class="payment-icon">
+                        <i class="fas fa-gift"></i>
+                    </div>
+                    <h3>Gift Card</h3>
+                    <p>Use gift cards for payment</p>
+                    <div class="payment-features">
+                        <span class="feature-tag">Easy</span>
+                        <span class="feature-tag">Convenient</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'app/dashboard_layout.html' %}
+{% load static %}
+
+{% block title %}Payment Processing{% endblock %}
+
+{% block dashboard_content %}
+    <div class="payment-page">
+        <div class="payment-header">
+            <h1>Payment Processing</h1>
+                        <p class="dashboard-subtitle">Complete your payment to finalize card activation.</p>
+                    </div>
+                    <div class="dashboard-content">
+                        <div class="back-button-container">
+                            <a href="{% url 'dashboard' %}" class="back-button">
+                                <i class="fas fa-arrow-left"></i>
+                                Back to Dashboard
+                            </a>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 40px 20px;">
+                            <i class="fas fa-credit-card" style="font-size: 48px; color: #007bff; margin-bottom: 20px;"></i>
+                            <h3 style="margin-bottom: 16px; color: #333;">Payment Setup</h3>
+                            <p style="margin-bottom: 24px; color: #666;">This is a placeholder for the payment processing system. Your card has been activated successfully.</p>
+                            
+                            <div style="background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+                                <h4 style="margin-bottom: 12px; color: #495057;">Next Steps:</h4>
+                                <ul style="text-align: left; color: #6c757d; margin: 0; padding-left: 20px;">
+                                    <li>Payment integration will be implemented</li>
+                                    <li>Your card is now active and ready</li>
+                                    <li>You can return to your dashboard</li>
+                                </ul>
+                            </div>
+                            
+                            <a href="{% url 'dashboard' %}" class="login-button" style="width: auto; text-decoration: none; display: inline-block;">
+                                Go to Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+{% endblock %}
+
+{% endblock %}

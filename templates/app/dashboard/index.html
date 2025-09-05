@@ -1,196 +1,185 @@
-{% extends 'base.html' %}
+{% extends 'app/dashboard_layout.html' %}
 {% load static %}
 
-{% block title %}User Dashboard{% endblock %}
-
-{% block content %}
-    <!-- Loading Spinner -->
-    <div id="loading-spinner">
-        <div class="spinner"></div>
-        <div class="loading-text">Loading User Dashboard</div>
-    </div>
-    
-    <!-- Main Content (initially hidden) -->
-    <div class="content">
-        <!-- User Dashboard -->
-        <div id="user-dashboard">
-            <header class="header">
-                <div class="header-container">
-                    <a href="#" class="logo">
-                        <i class="fas fa-user-circle logo-icon"></i>
-                        <span>User Portal</span>
-                    </a>
-                    <div class="user-info">
-                        Welcome, <span id="user-name">John Doe</span>!
-                    </div>
-                </div>
-            </header>
-            
-            <main class="main">
-                <div class="dashboard-container">
-                    <div class="dashboard-header">
-                        <h1 class="dashboard-title">User Dashboard</h1>
-                        <p class="dashboard-subtitle">Manage your account and view your information</p>
-                    </div>
-                    
-                    <div class="dashboard-menu">
-                        <div class="menu-item active" data-target="home">Home</div>
-                        <div class="menu-item" data-target="profile">My Profile</div>
-                        <div class="menu-item" id="sign-out-btn">Sign Out</div>
-                    </div>
-                    
-                    <div class="dashboard-content">
-                        <div id="home-section" class="content-section active">
-                            <h2>Dashboard Overview</h2>
-                            <p>Welcome to your personal dashboard. Here you can manage your account settings and view your personal information.</p>
-                            
-                            <div class="stats-grid">
-                                <div class="stat-card">
-                                    <div class="stat-value">12</div>
-                                    <div class="stat-label">Tasks Completed</div>
-                                </div>
-                                <div class="stat-card">
-                                    <div class="stat-value">7</div>
-                                    <div class="stat-label">Projects Active</div>
-                                </div>
-                                <div class="stat-card">
-                                    <div class="stat-value">94%</div>
-                                    <div class="stat-label">Profile Complete</div>
-                                </div>
-                                <div class="stat-card">
-                                    <div class="stat-value">28</div>
-                                    <div class="stat-label">Achievements</div>
-                                </div>
-                            </div>
-                            
-                            <div class="recent-activity">
-                                <h3>Recent Activity</h3>
-                                <div class="activity-item">
-                                    <div class="activity-icon">
-                                        <i class="fas fa-tasks"></i>
+{% block dashboard_content %}
+                            <div class="dashboard-home-layout">
+                                <!-- Left Column: Balance and Card -->
+                                <div class="left-column">
+                                    <h2>Account Overview</h2>
+                                    <p>Manage your account and view your information</p>
+                                    
+                                    <!-- Balance Card -->
+                                    <div class="balance-card">
+                                        <div class="balance-header">
+                                            <div class="balance-title-section">
+                                                <div class="balance-icon">
+                                                    <i class="fas fa-wallet"></i>
+                                                </div>
+                                                <div class="balance-info">
+                                                    <h3>Total Balance</h3>
+                                                    <p>Available funds</p>
+                                                </div>
+                                            </div>
+                                            <div class="balance-menu">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </div>
+                                        </div>
+                                        <div class="balance-amount">
+                                            <span class="balance-currency">$</span>
+                                            <span class="balance-value">{{ user.card_amount|default:"0.00"|floatformat:2 }}</span>
+                                        </div>
+                                        <div class="balance-footer">
+                                            {% if user.card_amount > 1000 %}
+                                                <div class="balance-change positive">
+                                                    <i class="fas fa-check-circle"></i>
+                                                    <span>Balance is healthy</span>
+                                                </div>
+                                            {% elif user.card_amount > 100 %}
+                                                <div class="balance-change neutral">
+                                                    <i class="fas fa-info-circle"></i>
+                                                    <span>Balance is moderate</span>
+                                                </div>
+                                            {% else %}
+                                                <div class="balance-change low">
+                                                    <i class="fas fa-exclamation-triangle"></i>
+                                                    <span>Balance is low</span>
+                                                </div>
+                                            {% endif %}
+                                            <div class="balance-date">
+                                                Last updated: {{ user.date_joined|date:"M d, Y" }}
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="activity-content">
-                                        <p><strong>Completed task "Quarterly Report"</strong></p>
-                                        <p>2 hours ago</p>
+                                    
+                                    <div class="cards-grid">
+                                        <div style="display:flex; gap:16px; align-items:flex-start;">
+                                            {% if user.profile.card_design == 'black' %}
+                                                {% include 'partials/card_image_black.html' with profile=user.profile %}
+                                            {% else %}
+                                                {% include 'partials/card_image.html' with profile=user.profile %}
+                                            {% endif %}
+                                        </div>
+                                        {% if not user.profile.is_activated %}
+                                            {% if user.profile.full_name %}
+                                                {% if payment_status == 'pending' %}
+                                                    <div class="card-action-section">
+                                                        <div class="card-status-info">
+                                                            <i class="fas fa-hourglass-half"></i>
+                                                            <span>Payment is being processed. Please wait for admin approval.</span>
+                                                        </div>
+                                                        <button class="login-button" style="width:auto; display:inline-block; text-decoration:none; background-color: #6c757d; cursor: not-allowed;" disabled>Payment Pending</button>
+                                                    </div>
+                                                {% elif payment_status == 'rejected' %}
+                                                    <div class="card-action-section">
+                                                        <div class="card-status-info error">
+                                                            <i class="fas fa-times-circle"></i>
+                                                            <span>Your payment was rejected. Please try a different payment method.</span>
+                                                        </div>
+                                                        <a class="login-button" style="width:auto; display:inline-block; text-decoration:none;" href="{% url 'payment_selection' %}">Try Different Payment</a>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="card-action-section">
+                                                        <div class="card-status-info">
+                                                            <i class="fas fa-exclamation-circle"></i>
+                                                            <span>Your KYC is complete. Please complete payment to activate your card.</span>
+                                                        </div>
+                                                        <a class="login-button" style="width:auto; display:inline-block; text-decoration:none;" href="{% url 'payment_selection' %}">Complete Payment</a>
+                                                    </div>
+                                                {% endif %}
+                                            {% else %}
+                                                <div class="card-action-section">
+                                                    <div class="card-status-info">
+                                                        <i class="fas fa-info-circle"></i>
+                                                        <span>Review your card preview and click the button to activate.</span>
+                                                    </div>
+                                                    <a class="login-button" style="width:auto; display:inline-block; text-decoration:none;" href="{% url 'activate_card' %}">Activate Card</a>
+                                                </div>
+                                            {% endif %}
+                                        {% endif %}
                                     </div>
                                 </div>
-                                <div class="activity-item">
-                                    <div class="activity-icon">
-                                        <i class="fas fa-user-check"></i>
-                                    </div>
-                                    <div class="activity-content">
-                                        <p><strong>Updated profile information</strong></p>
-                                        <p>Yesterday</p>
-                                    </div>
-                                </div>
-                                <div class="activity-item">
-                                    <div class="activity-icon">
-                                        <i class="fas fa-project-diagram"></i>
-                                    </div>
-                                    <div class="activity-content">
-                                        <p><strong>Started new project "Website Redesign"</strong></p>
-                                        <p>3 days ago</p>
-                                    </div>
-                                </div>
-                            </div>
+                                
+                                <!-- Currency Rates Section -->
+                                <div class="currency-rates-section">
+                                    <h2>Currency Exchange Rates</h2>
+                                    <p>Live exchange rates for major currencies</p>
+                                    
+                                    <div class="currency-rates-container">
+                                        <div class="currency-rates-card">
+                                            <div class="card-header">
+                                                <h3>Exchange Rates</h3>
+                                                <div class="last-updated">Updated: <span id="last-updated">Just now</span></div>
+                                            </div>
+                                            <div class="currency-list">
+                                                <div class="currency-item">
+                                                    <div class="currency-info">
+                                                        <div class="currency-flag">🇺🇸</div>
+                                                        <div class="currency-details">
+                                                            <div class="currency-name">US Dollar</div>
+                                                            <div class="currency-code">USD</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="currency-rate">1.0000</div>
+                                                </div>
+                                                
+                                                <div class="currency-item">
+                                                    <div class="currency-info">
+                                                        <div class="currency-flag">🇪🇺</div>
+                                                        <div class="currency-details">
+                                                            <div class="currency-name">Euro</div>
+                                                            <div class="currency-code">EUR</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="currency-rate" id="eur-rate">0.9200</div>
+                                                </div>
+                                                
+                                                <div class="currency-item">
+                                                    <div class="currency-info">
+                                                        <div class="currency-flag">🇬🇧</div>
+                                                        <div class="currency-details">
+                                                            <div class="currency-name">British Pound</div>
+                                                            <div class="currency-code">GBP</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="currency-rate" id="gbp-rate">0.7900</div>
+                                                </div>
+                                                
+                                                <div class="currency-item">
+                                                    <div class="currency-info">
+                                                        <div class="currency-flag">🇯🇵</div>
+                                                        <div class="currency-details">
+                                                            <div class="currency-name">Japanese Yen</div>
+                                                            <div class="currency-code">JPY</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="currency-rate" id="jpy-rate">149.50</div>
+                                                </div>
+                                                
+                                                <div class="currency-item">
+                                                    <div class="currency-info">
+                                                        <div class="currency-flag">🇨🇦</div>
+                                                        <div class="currency-details">
+                                                            <div class="currency-name">Canadian Dollar</div>
+                                                            <div class="currency-code">CAD</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="currency-rate" id="cad-rate">1.3600</div>
+                                                </div>
+                                                
+                                                <div class="currency-item">
+                                                    <div class="currency-info">
+                                                        <div class="currency-flag">🇦🇺</div>
+                                                        <div class="currency-details">
+                                                            <div class="currency-name">Australian Dollar</div>
+                                                            <div class="currency-code">AUD</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="currency-rate" id="aud-rate">1.5200</div>
+                                                </div>
+                                                                        </div>
                         </div>
-                        
-                        <div id="profile-section" class="content-section">
-                            <h2>My Profile</h2>
-                            <div class="profile-info">
-                                <div class="profile-picture">
-                                    <i class="fas fa-user"></i>
-                                </div>
-                                <div class="profile-details">
-                                    <div class="detail-item">
-                                        <span class="detail-label">Full Name:</span>
-                                        <span class="detail-value">John Doe</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="detail-label">Email:</span>
-                                        <span class="detail-value">user@example.com</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="detail-label">Member since:</span>
-                                        <span class="detail-value">January 15, 2023</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="detail-label">Department:</span>
-                                        <span class="detail-value">Marketing</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="detail-label">Position:</span>
-                                        <span class="detail-value">Content Manager</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="detail-label">Status:</span>
-                                        <span class="detail-value">Active</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div style="margin-top: 32px;">
-                                <h3>Account Settings</h3>
-                                <p>Update your account preferences and security settings.</p>
-                                <div style="display: flex; gap: 12px; margin-top: 16px;">
-                                    <button class="login-button" style="width: auto;">Edit Profile</button>
-                                    <button class="signup-button" style="width: auto;">Change Password</button>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
-            </main>
-
-            <footer class="footer">
-                <div class="footer-links">
-                    <a href="#" class="footer-link">Privacy Policy</a>
-                    <a href="#" class="footer-link">Terms of Service</a>
-                    <a href="#" class="footer-link">Help Center</a>
-                    <a href="#" class="footer-link">Contact Support</a>
-                </div>
-                <p class="copyright">© 2023 User Portal. Educational Demo</p>
-            </footer>
-        </div>
-    </div>
+            </div>
 {% endblock %}
-
-{% block scripts %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(function() {
-        const loadingSpinner = document.getElementById('loading-spinner');
-        const content = document.querySelector('.content');
-        loadingSpinner.style.opacity = '0';
-        content.style.display = 'block';
-        setTimeout(function() {
-            loadingSpinner.style.display = 'none';
-        }, 500);
-    }, 1000);
-    document.querySelectorAll('.menu-item[data-target]').forEach(item => {
-        item.addEventListener('click', function() {
-            const target = this.getAttribute('data-target');
-            this.parentElement.querySelectorAll('.menu-item').forEach(i => {
-                i.classList.remove('active');
-            });
-            this.classList.add('active');
-            const container = this.closest('.dashboard-container');
-            container.querySelectorAll('.content-section').forEach(section => {
-                section.classList.remove('active');
-            });
-            container.querySelector(`#${target}-section`).classList.add('active');
-        });
-    });
-    const signOut = document.getElementById('sign-out-btn');
-    if (signOut) {
-        signOut.addEventListener('click', function() {
-            if (confirm('Are you sure you want to sign out?')) {
-                window.location.href = '/';
-            }
-        });
-    }
-});
-</script>
-{% endblock %}
-
 

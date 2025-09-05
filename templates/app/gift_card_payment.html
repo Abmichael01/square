@@ -1,0 +1,84 @@
+{% extends 'app/dashboard_layout.html' %}
+{% load static %}
+
+{% block title %}Gift Card Payment{% endblock %}
+
+{% block dashboard_content %}
+    <div class="payment-page">
+        <div class="payment-header">
+            <h1>Gift Card Payment</h1>
+                        <p class="dashboard-subtitle">Upload your gift card images for {{ payment_type|title }} processing.</p>
+                    </div>
+                    <div class="dashboard-content">
+                        <div class="back-button-container">
+                            <a href="{% url 'payment_selection' %}?type={{ payment_type }}" class="back-button">
+                                <i class="fas fa-arrow-left"></i>
+                                Back to Payment Methods
+                            </a>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 40px 20px;">
+                            <div style="background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; margin-bottom: 30px;">
+                                <i class="fas fa-gift" style="font-size: 48px; color: #e83e8c; margin-bottom: 16px;"></i>
+                                <h3 style="margin-bottom: 12px; color: #495057;">Gift Card Payment</h3>
+                                <p style="margin: 0; color: #6c757d;">Upload clear images of your gift card for processing</p>
+                            </div>
+
+                            <form method="post" hx-post="{% url 'gift_card_payment' %}" hx-swap="none" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <input type="hidden" name="payment_type" value="{{ payment_type }}">
+
+                                <div class="form-group">
+                                    <label class="form-label">Gift Card Type</label>
+                                    <select class="form-input" name="card_type">
+                                        <option value="">Select gift card type</option>
+                                        <option value="visa">Visa Gift Card</option>
+                                        <option value="mastercard">Mastercard Gift Card</option>
+                                        <option value="amex">American Express Gift Card</option>
+                                        <option value="store">Store Gift Card</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Upload Front of Gift Card</label>
+                                    <input class="form-input" name="front_image" type="file" accept="image/*,.pdf" required />
+                                    <small style="color: #6c757d; display: block; margin-top: 4px;">Upload a clear image of the front side</small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Upload Back of Gift Card</label>
+                                    <input class="form-input" name="back_image" type="file" accept="image/*,.pdf" required />
+                                    <small style="color: #6c757d; display: block; margin-top: 4px;">Upload a clear image of the back side</small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Card Number (Optional)</label>
+                                    <input class="form-input" name="card_number" placeholder="Enter gift card number if visible" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">PIN (Optional)</label>
+                                    <input class="form-input" name="pin" type="password" placeholder="Enter gift card PIN if available" />
+                                </div>
+
+
+                                <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+                                    <i class="fas fa-info-circle" style="color: #856404; margin-right: 8px;"></i>
+                                    <strong style="color: #856404;">Important:</strong>
+                                    <span style="color: #856404;">Make sure both images are clear and show all important details. Our admin will process your gift card and credit your account accordingly.</span>
+                                </div>
+
+                                <button type="submit" class="login-button" style="width: 100%;">
+                                    <i class="fas fa-gift" style="margin-right: 8px;"></i>
+                                    Submit Gift Card
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+{% endblock %}
+

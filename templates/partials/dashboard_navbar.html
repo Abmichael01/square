@@ -1,0 +1,26 @@
+<!-- Dashboard Navbar -->
+<div class="dashboard-navbar">
+    <div class="navbar-left">
+        <button class="sidebar-toggle" id="sidebar-toggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="breadcrumb">
+            <span class="breadcrumb-item active">Dashboard</span>
+        </div>
+    </div>
+    
+    <div class="navbar-right">
+        <div class="user-profile">
+            <div class="user-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="user-info">
+                <span class="user-name">{{ user.profile.full_name|default:user.email }}</span>
+                <span class="user-email">{{ user.email }}</span>
+            </div>
+            <div class="user-menu">
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        </div>
+    </div>
+</div>

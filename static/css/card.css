@@ -1,0 +1,273 @@
+/* Card Component Styles - Credit card designs and related components */
+
+/* Pure CSS Credit Card */
+.cc-card {
+    width: 320px;
+    height: 208px;
+    border-radius: 12px;
+    color: #0f172a;
+    padding: 14px 16px;
+    position: relative;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.12);
+    overflow: hidden;
+}
+
+/* Light variant (default) */
+.cc-card--light { 
+    /* Uses default styles defined above */
+}
+
+/* Dark variant */
+.cc-card--dark {
+    color: #ffffff;
+    background: linear-gradient(145deg, #1a1a1a 0%, #2d2d2d 40%, #404040 100%);
+    border: none;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.25);
+}
+
+.cc-card--dark .cc-chip {
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    border: none;
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,0.1);
+}
+
+.cc-card--dark .cc-line {
+    background: linear-gradient(90deg, #3498db 0%, #2980b9 100%);
+}
+
+.cc-card--dark .cc-diamond {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+}
+
+.cc-card--dark .cc-dots {
+    background-image: radial-gradient(rgba(255,255,255,0.15) 1px, transparent 1px);
+}
+
+.cc-card--dark .cc-number {
+    color: #ecf0f1;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.cc-card--dark .cc-valid-label {
+    color: #bdc3c7;
+}
+
+.cc-card--dark .cc-valid-date {
+    color: #ffffff;
+}
+
+.cc-card--dark .cc-name {
+    color: #ffffff;
+}
+
+/* Card Background Pattern */
+.cc-dots {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(0,0,0,0.08) 1px, transparent 1px);
+    background-size: 10px 10px;
+    opacity: 1;
+    pointer-events: none;
+}
+
+/* Card Layout */
+.cc-row { 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+}
+
+.cc-top { 
+    font-size: 12px; 
+    opacity: 0.9; 
+}
+
+.cc-title { 
+    font-weight: 600; 
+}
+
+.cc-bank { 
+    font-weight: 600; 
+}
+
+/* Diagonal Lines */
+.cc-diagonals { 
+    gap: 4px; 
+    margin-top: 6px; 
+}
+
+.cc-line { 
+    display: inline-block; 
+    height: 3px; 
+    border-radius: 3px; 
+}
+
+.cc-l1 { 
+    width: 80px; 
+    background: #60a5fa; 
+}
+
+.cc-l2 { 
+    width: 72px; 
+    background: #3b82f6; 
+}
+
+.cc-l3 { 
+    width: 64px; 
+    background: #1d4ed8; 
+}
+
+/* Chip */
+.cc-chip {
+    width: 34px; 
+    height: 26px; 
+    border-radius: 6px;
+    background: linear-gradient(180deg, #e2e8f0, #cbd5e1);
+    box-shadow: inset 0 0 0 2px rgba(0,0,0,0.08);
+}
+
+/* Card Number */
+.cc-number { 
+    margin-top: 18px; 
+    font-size: 20px; 
+    letter-spacing: 2px; 
+    font-family: 'Courier New', monospace; 
+    color: #0b1224; 
+    text-shadow: 0 1px 1px rgba(0,0,0,0.08); 
+}
+
+/* Card Details */
+.cc-details { 
+    margin-top: 8px; 
+    font-size: 11px; 
+    opacity: 0.9; 
+}
+
+.cc-valid-label { 
+    text-transform: uppercase; 
+    letter-spacing: 0.5px; 
+    opacity: 0.6; 
+}
+
+.cc-valid-date { 
+    font-weight: 700; 
+    margin-top: 2px; 
+    color: #1f2937; 
+}
+
+/* Bottom Section */
+.cc-bottom { 
+    margin-top: 10px; 
+}
+
+.cc-name { 
+    font-weight: 700; 
+    letter-spacing: 0.5px; 
+}
+
+.cc-brand { 
+    display: flex; 
+    gap: 6px; 
+    align-items: center; 
+}
+
+.cc-diamond { 
+    width: 12px; 
+    height: 12px; 
+    transform: rotate(45deg); 
+    display: inline-block; 
+}
+
+.cc-d1 { 
+    background: #3b82f6; 
+}
+
+.cc-d2 { 
+    background: #1d4ed8; 
+    margin-left: -4px; 
+}
+
+/* Card Container */
+.card-image-wrap {
+    display: flex;
+    justify-content: flex-start;
+}
+
+/* Card Selection Styles */
+.card-design-selection {
+    display: flex;
+    gap: 16px;
+    margin: 16px 0;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.card-design-option {
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 8px;
+    transition: border-color 0.2s;
+}
+
+.card-design-option:hover {
+    border-color: #006aff;
+}
+
+.card-design-option.selected {
+    border-color: #006aff;
+    background-color: rgba(0, 106, 255, 0.1);
+}
+
+.card-design-option .cc-card {
+    width: 200px;
+    height: 130px;
+    font-size: 10px;
+}
+
+.card-design-option .cc-card .cc-number {
+    font-size: 14px;
+    letter-spacing: 1px;
+}
+
+.card-design-option .cc-card .cc-title,
+.card-design-option .cc-card .cc-bank {
+    font-size: 10px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .cc-card {
+        width: 280px;
+        height: 182px;
+    }
+    
+    .card-design-selection {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .card-design-option .cc-card {
+        width: 180px;
+        height: 117px;
+    }
+}
+
+@media (max-width: 480px) {
+    .cc-card {
+        width: 260px;
+        height: 169px;
+    }
+    
+    .cc-number {
+        font-size: 16px;
+        letter-spacing: 1px;
+    }
+    
+    .card-design-option .cc-card {
+        width: 160px;
+        height: 104px;
+    }
+}

@@ -1,0 +1,42 @@
+<!-- Dashboard Sidebar -->
+<div class="dashboard-sidebar">
+    <div class="sidebar-header">
+        <div class="logo">
+            <i class="fas fa-user-circle logo-icon"></i>
+            <span>SquarePR</span>
+        </div>
+        <button class="sidebar-close-btn" id="sidebar-close-btn">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    
+    <nav class="sidebar-nav">
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="{% url 'dashboard' %}" class="nav-link active" data-section="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'profile' %}" class="nav-link" data-section="profile">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'transactions' %}" class="nav-link" data-section="transactions">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Transactions</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    
+    <div class="sidebar-footer">
+        <a href="#" class="nav-link logout" id="logout-btn">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Sign Out</span>
+        </a>
+    </div>
+</div>

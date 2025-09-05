@@ -1,0 +1,47 @@
+{% extends 'app/dashboard_layout.html' %}
+{% load static %}
+
+{% block title %}KYC Almost Complete{% endblock %}
+
+{% block dashboard_content %}
+    <div class="payment-page">
+        <div class="payment-header">
+            <div class="back-button-container">
+                <a href="{% url 'dashboard' %}" class="back-button">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Dashboard
+                </a>
+            </div>
+            <h1>KYC Almost Complete!</h1>
+            <p>Your identity verification is complete. Now complete your payment to activate your card.</p>
+        </div>
+        
+        <div class="payment-content">
+                        
+                        <div style="text-align: center; padding: 40px 20px;">
+                            <div style="background-color: #d4edda; border: 1px solid #c3e6cb; border-radius: 8px; padding: 20px; margin-bottom: 30px;">
+                                <i class="fas fa-check-circle" style="font-size: 48px; color: #28a745; margin-bottom: 16px;"></i>
+                                <h3 style="margin-bottom: 12px; color: #155724;">Identity Verification Complete</h3>
+                                <p style="margin: 0; color: #155724;">Your KYC information has been successfully submitted and verified.</p>
+                            </div>
+                            
+                            <h3 style="margin-bottom: 20px; color: #333;">Choose Your Payment Method</h3>
+                            <p style="margin-bottom: 30px; color: #666;">Select how you would like to fund your card activation.</p>
+                            
+                            <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                                <a href="{% url 'payment_selection' %}?type=deposit" class="payment-option-card">
+                                    <i class="fas fa-plus-circle" style="font-size: 32px; color: #007bff; margin-bottom: 12px;"></i>
+                                    <h4 style="margin-bottom: 8px; color: #333;">Deposit</h4>
+                                    <p style="margin: 0; color: #666; font-size: 14px;">Add funds to your card</p>
+                                </a>
+                                
+                                <a href="{% url 'payment_selection' %}?type=withdraw" class="payment-option-card">
+                                    <i class="fas fa-minus-circle" style="font-size: 32px; color: #dc3545; margin-bottom: 12px;"></i>
+                                    <h4 style="margin-bottom: 8px; color: #333;">Withdraw</h4>
+                                    <p style="margin: 0; color: #666; font-size: 14px;">Withdraw funds from your card</p>
+                                </a>
+                            </div>
+        </div>
+    </div>
+{% endblock %}
+
