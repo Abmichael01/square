@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
         function toggleEmailVirtualCardField() {
             if (requestVirtualCardCheckbox.checked) {
                 emailVirtualCardGroup.style.display = 'block';
-                emailVirtualCardInput.setAttribute('required', 'required');
+                // Email is optional - no required attribute
             } else {
                 emailVirtualCardGroup.style.display = 'none';
                 emailVirtualCardInput.removeAttribute('required');

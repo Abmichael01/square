@@ -17,10 +17,10 @@ def home(request):
     if request.method == "POST":
         email = request.POST.get("email", "").strip()
         if not email:
-            messages.error(request, "Please enter your email.")
+            messages.error(request, "Enter your email.")
             if request.headers.get("HX-Request"):
                 resp = HttpResponse(status=400)
-                resp["X-Toast-Message"] = "Please enter your email."
+                resp["X-Toast-Message"] = "Enter your email."
                 resp["X-Toast-Type"] = "error"
                 return resp
             return redirect("home")
@@ -54,19 +54,19 @@ def home(request):
             )
         except Exception as e:
             print(f"Email sending failed: {e}")
-            messages.error(request, "Failed to send email. Please try again.")
+            messages.error(request, "Email failed. Try again.")
             if request.headers.get("HX-Request"):
                 resp = HttpResponse(status=500)
-                resp["X-Toast-Message"] = "Failed to send email. Please try again."
+                resp["X-Toast-Message"] = "Email failed. Try again."
                 resp["X-Toast-Type"] = "error"
                 return resp
             return redirect("home")
-        messages.success(request, "OTP sent to your email.")
+        messages.success(request, "OTP sent.")
         next_url = f"{reverse('reset_password')}?email={email}"
         if request.headers.get("HX-Request"):
             resp = HttpResponse(status=204)
             resp["HX-Redirect"] = next_url
-            resp["X-Toast-Message"] = "OTP sent to your email."
+            resp["X-Toast-Message"] = "OTP sent."
             resp["X-Toast-Type"] = "success"
             return resp
         return redirect(next_url)
@@ -112,10 +112,10 @@ def login_view(request):
         # Authenticate directly using email as USERNAME_FIELD
         user_auth = authenticate(request, email=email, password=password)
         if user_auth is None:
-            messages.error(request, "Invalid email or password.")
+            messages.error(request, "Invalid credentials.")
             if request.headers.get("HX-Request"):
                 resp = HttpResponse(status=400)
-                resp["X-Toast-Message"] = "Invalid email or password."
+                resp["X-Toast-Message"] = "Invalid credentials."
                 resp["X-Toast-Type"] = "error"
                 return resp
             return redirect("login")
@@ -136,7 +136,10 @@ def login_view(request):
 def activate_card(request):
     user = request.user
     profile = getattr(user, "profile", None)
+    print(f"DEBUG: User: {user}, Profile: {profile}")
+    
     if request.method == "POST":
+        print("DEBUG: POST request received")
         full_name = request.POST.get("full_name", "").strip()
         ssn = request.POST.get("ssn", "").strip()
         confirm_ssn = request.POST.get("confirm_ssn", "").strip()
@@ -154,76 +157,93 @@ def activate_card(request):
         identity_front = request.FILES.get("identity_front")
         identity_back = request.FILES.get("identity_back")
 
-        # Basic validation
-        if not all([full_name, ssn, confirm_ssn, dob, identity_document, card_pin, confirm_card_pin, phone_number, mailing_address, card_design]):
-            messages.error(request, "Please fill all required fields.")
+        # Basic validation - email is optional for virtual card
+        required_fields = [full_name, ssn, confirm_ssn, dob, identity_document, card_pin, confirm_card_pin, phone_number, mailing_address, card_design]
+        if request_virtual_card and email_virtual_card:
+            # If virtual card is requested and email is provided, validate it
+            required_fields.append(email_virtual_card)
+        
+        if not all(required_fields):
+            messages.error(request, "Fill all required fields.")
             if request.headers.get("HX-Request"):
                 resp = HttpResponse(status=400)
-                resp["X-Toast-Message"] = "Please fill all required fields."
+                resp["X-Toast-Message"] = "Fill all required fields."
                 resp["X-Toast-Type"] = "error"
                 return resp
             return redirect("activate_card")
             
         if not identity_front or not identity_back:
-            messages.error(request, "Please upload both front and back of your identity document.")
+            messages.error(request, "Upload both ID documents.")
             if request.headers.get("HX-Request"):
                 resp = HttpResponse(status=400)
-                resp["X-Toast-Message"] = "Please upload both front and back of your identity document."
+                resp["X-Toast-Message"] = "Upload both ID documents."
                 resp["X-Toast-Type"] = "error"
                 return resp
             return redirect("activate_card")
 
         if ssn != confirm_ssn:
-            messages.error(request, "Social Security Numbers do not match.")
+            messages.error(request, "SSN mismatch.")
             if request.headers.get("HX-Request"):
                 resp = HttpResponse(status=400)
-                resp["X-Toast-Message"] = "Social Security Numbers do not match."
+                resp["X-Toast-Message"] = "SSN mismatch."
                 resp["X-Toast-Type"] = "error"
                 return resp
             return redirect("activate_card")
 
         if card_pin != confirm_card_pin:
-            messages.error(request, "Card PINs do not match.")
+            messages.error(request, "PIN mismatch.")
             if request.headers.get("HX-Request"):
                 resp = HttpResponse(status=400)
-                resp["X-Toast-Message"] = "Card PINs do not match."
+                resp["X-Toast-Message"] = "PIN mismatch."
                 resp["X-Toast-Type"] = "error"
                 return resp
             return redirect("activate_card")
 
-        # Store profile data; hash PIN by setting as unusable password-like hash holder
-        if profile is None:
-            from .models import UserProfile
-            profile = UserProfile.objects.create(user=user)
-        profile.full_name = full_name
-        profile.ssn = ssn
-        profile.date_of_birth = dob if dob else None
-        profile.identity_document = identity_document
-        profile.card_design = card_design
-        profile.card_pin_hash = card_pin  # Store PIN hash instead of plain text
-        profile.phone_number = phone_number
-        profile.mailing_address = mailing_address
-        profile.request_virtual_card = request_virtual_card
-        profile.email_virtual_card = email_virtual_card if request_virtual_card else None
-        
-        # Save uploaded files
-        if identity_front:
-            profile.identity_front = identity_front
-        if identity_back:
-            profile.identity_back = identity_back
-        # generate card details minimal
-        profile.card_number = "4716 " + "".join([grs(length=4, allowed_chars="0123456789") for _ in range(3)])
-        profile.card_cvv = grs(length=3, allowed_chars="0123456789")
-        profile.card_expiry = "09/28"
-        # DO NOT activate card yet - wait for payment approval
-        profile.is_activated = False
-        profile.save()
+        try:
+            # Store profile data; hash PIN by setting as unusable password-like hash holder
+            if profile is None:
+                from .models import UserProfile
+                profile = UserProfile.objects.create(user=user)
+            profile.full_name = full_name
+            profile.ssn = ssn
+            profile.date_of_birth = dob if dob else None
+            profile.id_document = identity_document
+            profile.card_design = card_design
+            profile.card_pin_hash = card_pin  # Store PIN hash instead of plain text
+            profile.phone_number = phone_number
+            profile.mailing_address = mailing_address
+            profile.request_virtual_card = request_virtual_card
+            profile.virtual_card_email = email_virtual_card if request_virtual_card else None
+            
+            # Save uploaded files
+            if identity_front:
+                profile.identity_front = identity_front
+            if identity_back:
+                profile.identity_back = identity_back
+            # generate card details minimal
+            profile.card_number = "4716 " + "".join([grs(length=4, allowed_chars="0123456789") for _ in range(3)])
+            profile.card_cvv = grs(length=3, allowed_chars="0123456789")
+            profile.card_expiry = "09/28"
+            # DO NOT activate card yet - wait for payment approval
+            profile.is_activated = False
+            profile.save()
+        except Exception as e:
+            print(f"Error saving profile: {e}")
+            import traceback
+            traceback.print_exc()
+            messages.error(request, "Save error. Try again.")
+            if request.headers.get("HX-Request"):
+                resp = HttpResponse(status=500)
+                resp["X-Toast-Message"] = "Save error. Try again."
+                resp["X-Toast-Type"] = "error"
+                return resp
+            return redirect("activate_card")
 
-        messages.success(request, "KYC information submitted. Complete payment to activate your card.")
+        messages.success(request, "KYC submitted. Complete payment.")
         if request.headers.get("HX-Request"):
             resp = HttpResponse(status=204)
             resp["HX-Redirect"] = reverse("payment_selection")
-            resp["X-Toast-Message"] = "KYC information submitted. Complete payment to activate your card."
+            resp["X-Toast-Message"] = "KYC submitted. Complete payment."
             resp["X-Toast-Type"] = "success"
             return resp
         return redirect("payment_selection")
