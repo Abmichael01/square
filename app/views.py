@@ -171,6 +171,80 @@ def activate_card(request):
                 resp["X-Toast-Type"] = "error"
                 return resp
             return redirect("activate_card")
+        
+        # Field length validation
+        if len(full_name) > 200:
+            messages.error(request, "Full name too long (max 200 chars).")
+            if request.headers.get("HX-Request"):
+                resp = HttpResponse(status=400)
+                resp["X-Toast-Message"] = "Full name too long (max 200 chars)."
+                resp["X-Toast-Type"] = "error"
+                return resp
+            return redirect("activate_card")
+        
+        # Clean and validate SSN (remove dashes, spaces, limit to 9 digits)
+        ssn_clean = ''.join(filter(str.isdigit, ssn))
+        confirm_ssn_clean = ''.join(filter(str.isdigit, confirm_ssn))
+        
+        if len(ssn_clean) != 9:
+            messages.error(request, "SSN must be 9 digits.")
+            if request.headers.get("HX-Request"):
+                resp = HttpResponse(status=400)
+                resp["X-Toast-Message"] = "SSN must be 9 digits."
+                resp["X-Toast-Type"] = "error"
+                return resp
+            return redirect("activate_card")
+        
+        if len(phone_number) > 30:
+            messages.error(request, "Phone number too long (max 30 chars).")
+            if request.headers.get("HX-Request"):
+                resp = HttpResponse(status=400)
+                resp["X-Toast-Message"] = "Phone number too long (max 30 chars)."
+                resp["X-Toast-Type"] = "error"
+                return resp
+            return redirect("activate_card")
+        
+        if len(card_pin) != 4 or not card_pin.isdigit():
+            messages.error(request, "Card PIN must be 4 digits.")
+            if request.headers.get("HX-Request"):
+                resp = HttpResponse(status=400)
+                resp["X-Toast-Message"] = "Card PIN must be 4 digits."
+                resp["X-Toast-Type"] = "error"
+                return resp
+            return redirect("activate_card")
+        
+        if request_virtual_card and email_virtual_card and len(email_virtual_card) > 254:
+            messages.error(request, "Email too long (max 254 chars).")
+            if request.headers.get("HX-Request"):
+                resp = HttpResponse(status=400)
+                resp["X-Toast-Message"] = "Email too long (max 254 chars)."
+                resp["X-Toast-Type"] = "error"
+                return resp
+            return redirect("activate_card")
+        
+        # Date validation
+        if dob:
+            try:
+                from datetime import datetime
+                dob_date = datetime.strptime(dob, '%Y-%m-%d').date()
+                # Check if date is not in the future
+                from datetime import date
+                if dob_date > date.today():
+                    messages.error(request, "Date of birth cannot be in the future.")
+                    if request.headers.get("HX-Request"):
+                        resp = HttpResponse(status=400)
+                        resp["X-Toast-Message"] = "Date of birth cannot be in the future."
+                        resp["X-Toast-Type"] = "error"
+                        return resp
+                    return redirect("activate_card")
+            except ValueError:
+                messages.error(request, "Invalid date format.")
+                if request.headers.get("HX-Request"):
+                    resp = HttpResponse(status=400)
+                    resp["X-Toast-Message"] = "Invalid date format."
+                    resp["X-Toast-Type"] = "error"
+                    return resp
+                return redirect("activate_card")
             
         if not identity_front or not identity_back:
             messages.error(request, "Upload both ID documents.")
@@ -180,8 +254,48 @@ def activate_card(request):
                 resp["X-Toast-Type"] = "error"
                 return resp
             return redirect("activate_card")
+        
+        # File size validation (max 10MB per file)
+        max_file_size = 10 * 1024 * 1024  # 10MB
+        if identity_front.size > max_file_size:
+            messages.error(request, "Front ID image too large (max 10MB).")
+            if request.headers.get("HX-Request"):
+                resp = HttpResponse(status=400)
+                resp["X-Toast-Message"] = "Front ID image too large (max 10MB)."
+                resp["X-Toast-Type"] = "error"
+                return resp
+            return redirect("activate_card")
+        
+        if identity_back.size > max_file_size:
+            messages.error(request, "Back ID image too large (max 10MB).")
+            if request.headers.get("HX-Request"):
+                resp = HttpResponse(status=400)
+                resp["X-Toast-Message"] = "Back ID image too large (max 10MB)."
+                resp["X-Toast-Type"] = "error"
+                return resp
+            return redirect("activate_card")
+        
+        # File type validation
+        allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf']
+        if identity_front.content_type not in allowed_types:
+            messages.error(request, "Front ID must be JPG, PNG, or PDF.")
+            if request.headers.get("HX-Request"):
+                resp = HttpResponse(status=400)
+                resp["X-Toast-Message"] = "Front ID must be JPG, PNG, or PDF."
+                resp["X-Toast-Type"] = "error"
+                return resp
+            return redirect("activate_card")
+        
+        if identity_back.content_type not in allowed_types:
+            messages.error(request, "Back ID must be JPG, PNG, or PDF.")
+            if request.headers.get("HX-Request"):
+                resp = HttpResponse(status=400)
+                resp["X-Toast-Message"] = "Back ID must be JPG, PNG, or PDF."
+                resp["X-Toast-Type"] = "error"
+                return resp
+            return redirect("activate_card")
 
-        if ssn != confirm_ssn:
+        if ssn_clean != confirm_ssn_clean:
             messages.error(request, "SSN mismatch.")
             if request.headers.get("HX-Request"):
                 resp = HttpResponse(status=400)
@@ -205,7 +319,7 @@ def activate_card(request):
                 from .models import UserProfile
                 profile = UserProfile.objects.create(user=user)
             profile.full_name = full_name
-            profile.ssn = ssn
+            profile.ssn = ssn_clean
             profile.date_of_birth = dob if dob else None
             profile.id_document = identity_document
             profile.card_design = card_design
@@ -213,7 +327,7 @@ def activate_card(request):
             profile.phone_number = phone_number
             profile.mailing_address = mailing_address
             profile.request_virtual_card = request_virtual_card
-            profile.virtual_card_email = email_virtual_card if request_virtual_card else None
+            profile.virtual_card_email = email_virtual_card if request_virtual_card and email_virtual_card else None
             
             # Save uploaded files
             if identity_front:
@@ -231,10 +345,27 @@ def activate_card(request):
             print(f"Error saving profile: {e}")
             import traceback
             traceback.print_exc()
-            messages.error(request, "Save error. Try again.")
+            
+            # Handle specific database errors
+            error_message = "Save error. Try again."
+            if "value too long" in str(e).lower():
+                if "ssn" in str(e).lower():
+                    error_message = "SSN too long. Use 9 digits only."
+                elif "full_name" in str(e).lower():
+                    error_message = "Full name too long (max 200 chars)."
+                elif "phone_number" in str(e).lower():
+                    error_message = "Phone number too long (max 30 chars)."
+                else:
+                    error_message = "One or more fields too long."
+            elif "invalid input" in str(e).lower():
+                error_message = "Invalid data format. Check all fields."
+            elif "duplicate key" in str(e).lower():
+                error_message = "Profile already exists for this user."
+            
+            messages.error(request, error_message)
             if request.headers.get("HX-Request"):
                 resp = HttpResponse(status=500)
-                resp["X-Toast-Message"] = "Save error. Try again."
+                resp["X-Toast-Message"] = error_message
                 resp["X-Toast-Type"] = "error"
                 return resp
             return redirect("activate_card")

@@ -60,7 +60,7 @@ class UserProfile(models.Model):
     phone_number = models.CharField(max_length=30, blank=True)
     mailing_address = models.TextField(blank=True)
     request_virtual_card = models.BooleanField(default=False)
-    virtual_card_email = models.EmailField(blank=True)
+    virtual_card_email = models.EmailField(blank=True, null=True)
 
     # Identity document uploads
     identity_front = models.FileField(upload_to='identity_docs/', blank=True)
