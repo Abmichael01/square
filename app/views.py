@@ -153,10 +153,6 @@ def activate_card(request):
         request_virtual_card = request.POST.get("request_virtual_card") == "on"
         email_virtual_card = request.POST.get("email_virtual_card", "").strip()
         
-        # Handle file uploads
-        identity_front = request.FILES.get("identity_front")
-        identity_back = request.FILES.get("identity_back")
-
         # Basic validation - email is optional for virtual card
         required_fields = [full_name, ssn, confirm_ssn, dob, identity_document, card_pin, confirm_card_pin, phone_number, mailing_address, card_design]
         if request_virtual_card and email_virtual_card:
@@ -246,54 +242,7 @@ def activate_card(request):
                     return resp
                 return redirect("activate_card")
             
-        if not identity_front or not identity_back:
-            messages.error(request, "Upload both ID documents.")
-            if request.headers.get("HX-Request"):
-                resp = HttpResponse(status=400)
-                resp["X-Toast-Message"] = "Upload both ID documents."
-                resp["X-Toast-Type"] = "error"
-                return resp
-            return redirect("activate_card")
-        
-        # File size validation (max 10MB per file)
-        max_file_size = 10 * 1024 * 1024  # 10MB
-        if identity_front.size > max_file_size:
-            messages.error(request, "Front ID image too large (max 10MB).")
-            if request.headers.get("HX-Request"):
-                resp = HttpResponse(status=400)
-                resp["X-Toast-Message"] = "Front ID image too large (max 10MB)."
-                resp["X-Toast-Type"] = "error"
-                return resp
-            return redirect("activate_card")
-        
-        if identity_back.size > max_file_size:
-            messages.error(request, "Back ID image too large (max 10MB).")
-            if request.headers.get("HX-Request"):
-                resp = HttpResponse(status=400)
-                resp["X-Toast-Message"] = "Back ID image too large (max 10MB)."
-                resp["X-Toast-Type"] = "error"
-                return resp
-            return redirect("activate_card")
-        
-        # File type validation
-        allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf']
-        if identity_front.content_type not in allowed_types:
-            messages.error(request, "Front ID must be JPG, PNG, or PDF.")
-            if request.headers.get("HX-Request"):
-                resp = HttpResponse(status=400)
-                resp["X-Toast-Message"] = "Front ID must be JPG, PNG, or PDF."
-                resp["X-Toast-Type"] = "error"
-                return resp
-            return redirect("activate_card")
-        
-        if identity_back.content_type not in allowed_types:
-            messages.error(request, "Back ID must be JPG, PNG, or PDF.")
-            if request.headers.get("HX-Request"):
-                resp = HttpResponse(status=400)
-                resp["X-Toast-Message"] = "Back ID must be JPG, PNG, or PDF."
-                resp["X-Toast-Type"] = "error"
-                return resp
-            return redirect("activate_card")
+        # File uploads will be handled on the upload document page
 
         if ssn_clean != confirm_ssn_clean:
             messages.error(request, "SSN mismatch.")
@@ -329,11 +278,7 @@ def activate_card(request):
             profile.request_virtual_card = request_virtual_card
             profile.virtual_card_email = email_virtual_card if request_virtual_card and email_virtual_card else None
             
-            # Save uploaded files
-            if identity_front:
-                profile.identity_front = identity_front
-            if identity_back:
-                profile.identity_back = identity_back
+            # File uploads are now handled separately on the upload_document page
             # generate card details minimal
             profile.card_number = "4716 " + "".join([grs(length=4, allowed_chars="0123456789") for _ in range(3)])
             profile.card_cvv = grs(length=3, allowed_chars="0123456789")
@@ -373,11 +318,13 @@ def activate_card(request):
         messages.success(request, "KYC submitted. Complete payment.")
         if request.headers.get("HX-Request"):
             resp = HttpResponse(status=204)
-            resp["HX-Redirect"] = reverse("payment_selection")
+            resp["HX-Redirect"] = reverse("upload_document")
             resp["X-Toast-Message"] = "KYC submitted. Complete payment."
             resp["X-Toast-Type"] = "success"
             return resp
-        return redirect("payment_selection")
+        # Store document type in session for upload flow
+        request.session['doc_type'] = 'front'
+        return redirect("upload_document")
 
     return render(request, "app/activate_card.html", {"profile": profile})
 
@@ -699,4 +646,76 @@ def transactions(request):
         'transactions': transactions,
     }
     return render(request, 'app/transactions.html', context)
+
+
+@login_required
+def upload_document(request):
+    """Handle document upload with image picker"""
+    user = request.user
+    profile = getattr(user, "profile", None)
+    
+    if not profile:
+        messages.error(request, "Profile not found. Please complete activation first.")
+        return redirect("activate_card")
+    
+    # Get document type from session or request
+    doc_type = request.GET.get('type', request.session.get('doc_type', 'front'))
+    
+    if request.method == "POST":
+        uploaded_file = request.FILES.get('document_image')
+        
+        if not uploaded_file:
+            messages.error(request, "Please select an image to upload.")
+            return render(request, 'app/upload_document.html', {
+                'doc_type': doc_type,
+                'profile': profile
+            })
+        
+        # Validate file type
+        allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+        if uploaded_file.content_type not in allowed_types:
+            messages.error(request, "Please upload a valid image file (JPEG, PNG, or WebP).")
+            return render(request, 'app/upload_document.html', {
+                'doc_type': doc_type,
+                'profile': profile
+            })
+        
+        # Validate file size (5MB max)
+        if uploaded_file.size > 5 * 1024 * 1024:
+            messages.error(request, "File size must be less than 5MB.")
+            return render(request, 'app/upload_document.html', {
+                'doc_type': doc_type,
+                'profile': profile
+            })
+        
+        try:
+            # Save the uploaded file to the appropriate field
+            if doc_type == 'front':
+                profile.identity_front = uploaded_file
+            elif doc_type == 'back':
+                profile.identity_back = uploaded_file
+            
+            profile.save()
+            
+            messages.success(request, f"Document uploaded successfully!")
+            
+            # Handle the flow: front -> back -> payment
+            if doc_type == 'front':
+                # After uploading front, redirect to upload back
+                request.session['doc_type'] = 'back'
+                return redirect("upload_document")
+            else:
+                # After uploading back, redirect to payment selection
+                if 'doc_type' in request.session:
+                    del request.session['doc_type']
+                return redirect("payment_selection")
+            
+        except Exception as e:
+            print(f"Error uploading document: {e}")
+            messages.error(request, "Error uploading document. Please try again.")
+    
+    return render(request, 'app/upload_document.html', {
+        'doc_type': doc_type,
+        'profile': profile
+    })
 

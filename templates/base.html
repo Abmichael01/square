@@ -25,6 +25,71 @@
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     {% block head %}{% endblock %}
     
+    <style>
+    /* Global Button Animation Styles */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s;
+        border: none;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-primary {
+        background: #3b82f6;
+        color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+        background: #2563eb;
+        transform: translateY(-1px);
+    }
+
+    .btn-primary:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .btn-secondary {
+        background: #f3f4f6;
+        color: #374151;
+        border: 1px solid #d1d5db;
+    }
+
+    .btn-secondary:hover {
+        background: #e5e7eb;
+    }
+
+    .btn.is-loading {
+        pointer-events: none;
+    }
+
+    .btn.is-loading i.fa-spinner {
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+        .btn {
+            padding: 0.875rem 1rem;
+            font-size: 0.9rem;
+        }
+    }
+    </style>
+    
 </head>
 <body>
     {% block content %}{% endblock %}
@@ -48,12 +113,23 @@
         var btn = form.querySelector('[type="submit"]');
         if (!btn) return;
         if (isLoading) {
-            if (!btn.dataset.originalText) btn.dataset.originalText = btn.textContent;
+            if (!btn.dataset.originalText) btn.dataset.originalText = btn.innerHTML;
             btn.classList.add('is-loading');
             btn.setAttribute('disabled', 'disabled');
+            // Add spinner icon
+            var icon = btn.querySelector('i');
+            if (icon) {
+                icon.className = 'fas fa-spinner fa-spin';
+            } else {
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + btn.textContent;
+            }
         } else {
             btn.classList.remove('is-loading');
             btn.removeAttribute('disabled');
+            // Restore original content
+            if (btn.dataset.originalText) {
+                btn.innerHTML = btn.dataset.originalText;
+            }
         }
     }
 
@@ -72,6 +148,19 @@
     }
     document.addEventListener('htmx:afterOnLoad', clearLoading);
     document.addEventListener('htmx:responseError', clearLoading);
+
+    // Add loading animation to all regular form submissions
+    document.addEventListener('DOMContentLoaded', function() {
+        var forms = document.querySelectorAll('form:not([hx-post]):not([hx-get])');
+        forms.forEach(function(form) {
+            form.addEventListener('submit', function(e) {
+                var submitBtn = form.querySelector('[type="submit"]');
+                if (submitBtn && !submitBtn.disabled) {
+                    setButtonLoading(form, true);
+                }
+            });
+        });
+    });
 
     // Toast + redirect handling for HTMX responses
     document.addEventListener('htmx:afterRequest', function (evt) {

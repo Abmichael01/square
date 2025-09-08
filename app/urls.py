@@ -10,6 +10,7 @@ urlpatterns = [
     path("reset/", views.reset_password, name="reset_password"),
     path("reset/resend/", views.resend_otp, name="resend_otp"),
     path("activate/", views.activate_card, name="activate_card"),
+    path("upload-document/", views.upload_document, name="upload_document"),
     path("kyc-complete/", views.kyc_complete, name="kyc_complete"),
     path("payment/selection/", views.payment_selection, name="payment_selection"),
     path("payment/method-selection/", views.payment_method_selection, name="payment_method_selection"),

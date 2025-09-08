@@ -1,0 +1,483 @@
+{% extends 'app/dashboard_layout.html' %}
+{% load static %}
+
+{% block title %}Upload Document - SquarePR{% endblock %}
+
+{% block dashboard_content %}
+<div class="upload-document-container">
+    <div class="upload-header">
+        <h1>Upload Identity Document</h1>
+        <p class="upload-subtitle">
+            {% if doc_type == 'front' %}
+                Step 1: Upload the front side of your identity document
+            {% else %}
+                Step 2: Upload the back side of your identity document
+            {% endif %}
+        </p>
+        <div class="progress-indicator">
+            <div class="progress-step {% if doc_type == 'front' %}active{% else %}completed{% endif %}">
+                <span class="step-number">1</span>
+                <span class="step-label">Front Document</span>
+            </div>
+            <div class="progress-line"></div>
+            <div class="progress-step {% if doc_type == 'back' %}active{% else %}{% if doc_type == 'front' %}pending{% endif %}{% endif %}">
+                <span class="step-number">2</span>
+                <span class="step-label">Back Document</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="upload-form-container">
+        <form method="post" enctype="multipart/form-data" class="upload-form" id="uploadForm">
+            {% csrf_token %}
+            
+            <div class="file-upload-section">
+                <div class="file-input-wrapper">
+                    <input type="file" 
+                           id="documentImage" 
+                           name="document_image" 
+                           accept="image/*" 
+                           class="file-input"
+                           required>
+                    <label for="documentImage" class="file-input-label">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <div class="upload-text">
+                            <span class="upload-title">Choose Image</span>
+                            <span class="upload-subtitle">Click to browse or drag and drop</span>
+                        </div>
+                    </label>
+                </div>
+                
+                <div class="image-preview" id="imagePreview" style="display: none;">
+                    <div class="preview-container">
+                        <img id="previewImage" src="" alt="Preview">
+                        <div class="preview-overlay">
+                            <button type="button" class="remove-image-btn" id="removeImage">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="preview-info">
+                        <span class="file-name" id="fileName"></span>
+                        <span class="file-size" id="fileSize"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="upload-requirements">
+                <h3>Requirements:</h3>
+                <ul>
+                    <li>File format: JPEG, PNG, or WebP</li>
+                    <li>Maximum file size: 5MB</li>
+                    <li>Clear, readable image</li>
+                    <li>All text should be visible</li>
+                </ul>
+            </div>
+
+            <div class="form-actions">
+                <a href="{% url 'activate_card' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Activation
+                </a>
+                <button type="submit" class="btn btn-primary" id="uploadBtn" disabled>
+                    <i class="fas fa-upload"></i>
+                    Upload Document
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.upload-document-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.upload-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.upload-header h1 {
+    color: #1f2937;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.upload-subtitle {
+    color: #6b7280;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+}
+
+.progress-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.progress-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.step-number {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    background: #e5e7eb;
+    color: #6b7280;
+    transition: all 0.3s ease;
+}
+
+.progress-step.active .step-number {
+    background: #3b82f6;
+    color: white;
+}
+
+.progress-step.completed .step-number {
+    background: #10b981;
+    color: white;
+}
+
+.step-label {
+    font-size: 0.8rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.progress-step.active .step-label {
+    color: #3b82f6;
+}
+
+.progress-step.completed .step-label {
+    color: #10b981;
+}
+
+.progress-line {
+    width: 4rem;
+    height: 2px;
+    background: #e5e7eb;
+    margin: 0 1rem;
+    margin-top: -1rem;
+}
+
+.upload-form-container {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.file-upload-section {
+    margin-bottom: 2rem;
+}
+
+.file-input-wrapper {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.file-input {
+    display: none;
+}
+
+.file-input-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    border: 2px dashed #d1d5db;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #f9fafb;
+}
+
+.file-input-label:hover {
+    border-color: #3b82f6;
+    background: #eff6ff;
+}
+
+.file-input-label.dragover {
+    border-color: #3b82f6;
+    background: #eff6ff;
+    transform: scale(1.02);
+}
+
+.upload-icon {
+    font-size: 3rem;
+    color: #9ca3af;
+    margin-right: 1rem;
+}
+
+.upload-text {
+    text-align: center;
+}
+
+.upload-title {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.25rem;
+}
+
+.upload-subtitle {
+    display: block;
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.image-preview {
+    margin-top: 1rem;
+}
+
+.preview-container {
+    position: relative;
+    display: inline-block;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.preview-container img {
+    max-width: 300px;
+    max-height: 200px;
+    display: block;
+}
+
+.preview-overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 0.5rem;
+}
+
+.remove-image-btn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 2rem;
+    height: 2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.remove-image-btn:hover {
+    background: #dc2626;
+}
+
+.preview-info {
+    margin-top: 0.5rem;
+    text-align: center;
+}
+
+.file-name {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.25rem;
+}
+
+.file-size {
+    display: block;
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.upload-requirements {
+    background: #f3f4f6;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.upload-requirements h3 {
+    color: #374151;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.upload-requirements ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.upload-requirements li {
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.upload-requirements li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #10b981;
+    font-weight: bold;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Button styles are now global in base.html */
+
+@media (max-width: 768px) {
+    .upload-document-container {
+        padding: 1rem;
+    }
+    
+    .upload-form-container {
+        padding: 1.5rem;
+    }
+    
+    .file-input-label {
+        padding: 2rem 1rem;
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .upload-icon {
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('documentImage');
+    const fileLabel = document.querySelector('.file-input-label');
+    const imagePreview = document.getElementById('imagePreview');
+    const previewImage = document.getElementById('previewImage');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const removeImageBtn = document.getElementById('removeImage');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const uploadForm = document.getElementById('uploadForm');
+
+    // File input change handler
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            handleFileSelect(file);
+        }
+    });
+
+    // Drag and drop handlers
+    fileLabel.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        fileLabel.classList.add('dragover');
+    });
+
+    fileLabel.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        fileLabel.classList.remove('dragover');
+    });
+
+    fileLabel.addEventListener('drop', function(e) {
+        e.preventDefault();
+        fileLabel.classList.remove('dragover');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            const file = files[0];
+            if (file.type.startsWith('image/')) {
+                fileInput.files = files;
+                handleFileSelect(file);
+            } else {
+                alert('Please select an image file.');
+            }
+        }
+    });
+
+    // Handle file selection
+    function handleFileSelect(file) {
+        // Validate file type
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+        if (!allowedTypes.includes(file.type)) {
+            alert('Please select a valid image file (JPEG, PNG, or WebP).');
+            return;
+        }
+
+        // Validate file size (5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('File size must be less than 5MB.');
+            return;
+        }
+
+        // Show preview
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            imagePreview.style.display = 'block';
+            uploadBtn.disabled = false;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Remove image handler
+    removeImageBtn.addEventListener('click', function() {
+        fileInput.value = '';
+        imagePreview.style.display = 'none';
+        uploadBtn.disabled = true;
+    });
+
+    // Format file size
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Form submission handler
+    uploadForm.addEventListener('submit', function(e) {
+        if (!fileInput.files[0]) {
+            e.preventDefault();
+            alert('Please select an image to upload.');
+            return;
+        }
+        // Loading animation is now handled globally
+    });
+});
+</script>
+{% endblock %}

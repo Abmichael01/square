@@ -18,7 +18,7 @@
         
         <div class="payment-content">
             <div class="payment-form">
-                <form method="post" hx-post="{% url 'activate_card' %}" hx-swap="none" enctype="multipart/form-data">
+                <form method="post" hx-post="{% url 'activate_card' %}" hx-swap="none">
   {% csrf_token %}
 
   <div class="form-group">
@@ -51,13 +51,13 @@
   </div>
 
   <div class="form-group">
-    <label class="form-label">Upload Front of Identity Document</label>
-    <input class="form-input" name="identity_front" type="file" accept="image/*,.pdf" required />
-  </div>
-
-  <div class="form-group">
-    <label class="form-label">Upload Back of Identity Document</label>
-    <input class="form-input" name="identity_back" type="file" accept="image/*,.pdf" required />
+    <label class="form-label">Identity Document Upload</label>
+    <div class="document-info">
+      <p class="upload-info">
+        <i class="fas fa-info-circle"></i>
+        You will be asked to upload your identity documents after submitting this form
+      </p>
+    </div>
   </div>
 
   <div class="form-group">
@@ -98,7 +98,10 @@
     <input class="form-input" name="email_virtual_card" type="email" placeholder="virtualcard@example.com" />
   </div>
 
-                        <button type="submit" class="login-button" style="width:auto;">Submit & Continue</button>
+                        <button type="submit" class="btn btn-primary" style="width:auto;">
+                            <i class="fas fa-arrow-right"></i>
+                            Submit & Continue
+                        </button>
                 </form>
             </div>
         </div>
@@ -106,6 +109,29 @@
 {% endblock %}
 
 {% block scripts %}
+<style>
+.document-info {
+    margin-top: 1rem;
+}
+
+.upload-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #64748b;
+    font-size: 0.9rem;
+    margin: 0;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 8px;
+    border-left: 4px solid #3b82f6;
+}
+
+.upload-info i {
+    color: #3b82f6;
+}
+</style>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Loading spinner
