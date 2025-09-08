@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
+    "cloudinary_storage",
+    "cloudinary",
     "app"
 ]
 
@@ -175,3 +177,13 @@ CACHES = {
 
 # Custom user model
 AUTH_USER_MODEL = "app.User"
+
+# Cloudinary Configuration
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', 'dummy_cloud_name'),
+    'API_KEY': os.getenv('CLOUDINARY_API_KEY', 'dummy_api_key'),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET', 'dummy_api_secret'),
+}
+
+# Use Cloudinary for media files
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'

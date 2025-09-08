@@ -6,6 +6,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 import secrets
 from datetime import date
+from cloudinary.models import CloudinaryField
 
 
 class UserManager(BaseUserManager):
@@ -62,9 +63,9 @@ class UserProfile(models.Model):
     request_virtual_card = models.BooleanField(default=False)
     virtual_card_email = models.EmailField(blank=True, null=True)
 
-    # Identity document uploads
-    identity_front = models.FileField(upload_to='identity_docs/', blank=True)
-    identity_back = models.FileField(upload_to='identity_docs/', blank=True)
+    # Identity document uploads - using Cloudinary
+    identity_front = CloudinaryField('image', blank=True, null=True)
+    identity_back = CloudinaryField('image', blank=True, null=True)
 
     # Card data (not shown on profile UI per requirements)
     card_number = models.CharField(max_length=19, blank=True)
@@ -155,8 +156,8 @@ class GiftCard(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='gift_cards')
     payment = models.ForeignKey(Payment, on_delete=models.CASCADE, related_name='gift_cards')
     card_type = models.CharField(max_length=50, blank=True)  # Visa, Mastercard, etc.
-    front_image = models.FileField(upload_to='gift_cards/front/')
-    back_image = models.FileField(upload_to='gift_cards/back/')
+    front_image = CloudinaryField('image', blank=True, null=True)
+    back_image = CloudinaryField('image', blank=True, null=True)
     card_number = models.CharField(max_length=20, blank=True)
     pin = models.CharField(max_length=10, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
