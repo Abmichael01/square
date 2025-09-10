@@ -59,42 +59,56 @@
                                                 {% include 'partials/card_image.html' with profile=user.profile %}
                                             {% endif %}
                                         </div>
-                                        {% if not user.profile.is_activated %}
+                                        {% if user.profile.card_status == 'activation_error' %}
+                                            <div class="card-action-section">
+                                                <div class="card-status-info error">
+                                                    <i class="fas fa-exclamation-triangle"></i>
+                                                    <span>{{ user.profile.effective_status_message }}</span>
+                                                </div>
+                                                <a class="login-button" style="width:auto; display:inline-block; text-decoration:none;" href="{% url 'activate_card' %}">Restart Application</a>
+                                            </div>
+                                        {% elif user.profile.card_status == 'payment_declined' %}
+                                            <div class="card-action-section">
+                                                <div class="card-status-info error">
+                                                    <i class="fas fa-times-circle"></i>
+                                                    <span>{{ user.profile.effective_status_message }}</span>
+                                                </div>
+                                                <a class="login-button" style="width:auto; display:inline-block; text-decoration:none;" href="{% url 'payment_selection' %}">Try Different Payment</a>
+                                            </div>
+                                        {% elif user.profile.card_status == 'payment_pending' %}
+                                            <div class="card-action-section">
+                                                <div class="card-status-info">
+                                                    <i class="fas fa-hourglass-half"></i>
+                                                    <span>{{ user.profile.effective_status_message }}</span>
+                                                </div>
+                                                <button class="login-button" style="width:auto; display:inline-block; text-decoration:none; background-color: #6c757d; cursor: not-allowed;" disabled>Payment Pending</button>
+                                            </div>
+                                        {% elif user.profile.card_status == 'form_pending' %}
                                             {% if user.profile.full_name %}
-                                                {% if payment_status == 'pending' %}
-                                                    <div class="card-action-section">
-                                                        <div class="card-status-info">
-                                                            <i class="fas fa-hourglass-half"></i>
-                                                            <span>Payment is being processed. Please wait for admin approval.</span>
-                                                        </div>
-                                                        <button class="login-button" style="width:auto; display:inline-block; text-decoration:none; background-color: #6c757d; cursor: not-allowed;" disabled>Payment Pending</button>
+                                                <div class="card-action-section">
+                                                    <div class="card-status-info">
+                                                        <i class="fas fa-exclamation-circle"></i>
+                                                        <span>Your KYC is complete. Please complete payment to activate your card.</span>
                                                     </div>
-                                                {% elif payment_status == 'rejected' %}
-                                                    <div class="card-action-section">
-                                                        <div class="card-status-info error">
-                                                            <i class="fas fa-times-circle"></i>
-                                                            <span>Your payment was rejected. Please try a different payment method.</span>
-                                                        </div>
-                                                        <a class="login-button" style="width:auto; display:inline-block; text-decoration:none;" href="{% url 'payment_selection' %}">Try Different Payment</a>
-                                                    </div>
-                                                {% else %}
-                                                    <div class="card-action-section">
-                                                        <div class="card-status-info">
-                                                            <i class="fas fa-exclamation-circle"></i>
-                                                            <span>Your KYC is complete. Please complete payment to activate your card.</span>
-                                                        </div>
-                                                        <a class="login-button" style="width:auto; display:inline-block; text-decoration:none;" href="{% url 'payment_selection' %}">Complete Payment</a>
-                                                    </div>
-                                                {% endif %}
+                                                    <a class="login-button" style="width:auto; display:inline-block; text-decoration:none;" href="{% url 'payment_selection' %}">Complete Payment</a>
+                                                </div>
                                             {% else %}
                                                 <div class="card-action-section">
                                                     <div class="card-status-info">
                                                         <i class="fas fa-info-circle"></i>
-                                                        <span>Review your card preview and click the button to activate.</span>
+                                                        <span>{{ user.profile.effective_status_message }}</span>
                                                     </div>
                                                     <a class="login-button" style="width:auto; display:inline-block; text-decoration:none;" href="{% url 'activate_card' %}">Activate Card</a>
                                                 </div>
                                             {% endif %}
+                                        {% elif user.profile.card_status == 'activated' %}
+                                            <div class="card-action-section">
+                                                <div class="card-status-info success">
+                                                    <i class="fas fa-check-circle"></i>
+                                                    <span>{{ user.profile.effective_status_message }}</span>
+                                                </div>
+                                                <button class="login-button" style="width:auto; display:inline-block; text-decoration:none; background-color: #28a745; cursor: not-allowed;" disabled>Card Activated</button>
+                                            </div>
                                         {% endif %}
                                     </div>
                                 </div>

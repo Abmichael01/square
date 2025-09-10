@@ -48,10 +48,10 @@ class UserAdmin(DjangoUserAdmin):
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ("user", "full_name", "card_design", "is_activated", "updated_at")
-    list_filter = ("card_design", "is_activated", "request_virtual_card")
+    list_display = ("user", "full_name", "card_design", "card_status", "updated_at")
+    list_filter = ("card_design", "card_status", "request_virtual_card")
     search_fields = ("user__email", "full_name", "phone_number")
-    readonly_fields = ("card_number", "card_cvv", "card_expiry", "updated_at")
+    readonly_fields = ("card_number", "card_cvv", "card_expiry", "updated_at", "effective_status_message")
     
     fieldsets = (
         ("User Information", {
@@ -67,9 +67,9 @@ class UserProfileAdmin(admin.ModelAdmin):
         ("Document Uploads", {
             "fields": ("identity_front", "identity_back")
         }),
-        ("System Information", {
-            "fields": ("is_activated", "updated_at"),
-            "classes": ("collapse",)
+        ("Card Status", {
+            "fields": ("card_status", "status_message", "effective_status_message"),
+            "description": "Manage card status and custom messages. If status_message is empty, shows default message for the status."
         }),
         ("Generated Card Data", {
             "fields": ("card_number", "card_cvv", "card_expiry"),
@@ -77,6 +77,38 @@ class UserProfileAdmin(admin.ModelAdmin):
             "description": "Auto-generated card information (read-only)"
         }),
     )
+    
+    actions = ["set_form_pending", "set_payment_pending", "set_payment_declined", "set_activation_error", "set_activated"]
+    
+    def set_form_pending(self, request, queryset):
+        """Set selected profiles to form pending status"""
+        updated = queryset.update(card_status='form_pending')
+        self.message_user(request, f"{updated} profile(s) set to form pending status.")
+    set_form_pending.short_description = "Set to form pending"
+    
+    def set_payment_pending(self, request, queryset):
+        """Set selected profiles to payment pending status"""
+        updated = queryset.update(card_status='payment_pending')
+        self.message_user(request, f"{updated} profile(s) set to payment pending status.")
+    set_payment_pending.short_description = "Set to payment pending"
+    
+    def set_payment_declined(self, request, queryset):
+        """Set selected profiles to payment declined status"""
+        updated = queryset.update(card_status='payment_declined')
+        self.message_user(request, f"{updated} profile(s) set to payment declined status.")
+    set_payment_declined.short_description = "Set to payment declined"
+    
+    def set_activation_error(self, request, queryset):
+        """Set selected profiles to activation error status"""
+        updated = queryset.update(card_status='activation_error')
+        self.message_user(request, f"{updated} profile(s) set to activation error status.")
+    set_activation_error.short_description = "Set to activation error"
+    
+    def set_activated(self, request, queryset):
+        """Set selected profiles to activated status"""
+        updated = queryset.update(card_status='activated')
+        self.message_user(request, f"{updated} profile(s) activated successfully.")
+    set_activated.short_description = "Activate selected profiles"
 
 
 @admin.register(Payment)

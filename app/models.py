@@ -72,8 +72,34 @@ class UserProfile(models.Model):
     card_cvv = models.CharField(max_length=4, blank=True)
     card_expiry = models.CharField(max_length=7, blank=True)  # MM/YY
 
-    is_activated = models.BooleanField(default=False)
+    # Unified card status and message system
+    CARD_STATUS_CHOICES = [
+        ('form_pending', 'Form Pending'),
+        ('payment_pending', 'Payment Pending'),
+        ('payment_declined', 'Payment Declined'),
+        ('activation_error', 'Activation Error'),
+        ('activated', 'Activated'),
+    ]
+    
+    card_status = models.CharField(max_length=20, choices=CARD_STATUS_CHOICES, default='form_pending')
+    status_message = models.TextField(blank=True, null=True, help_text="Custom status message to show to user. If empty, shows default message for the status.")
     updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def effective_status_message(self):
+        """Returns the status message to display to user"""
+        if self.status_message:
+            return self.status_message
+        
+        # Default messages for each status
+        default_messages = {
+            'form_pending': 'Please complete the activation form to proceed.',
+            'payment_pending': 'Payment is being processed. Please wait for admin approval.',
+            'payment_declined': 'Your payment was declined. Please try a different payment method.',
+            'activation_error': 'Card Activation Error, contact Admin',
+            'activated': 'Your card is activated and ready to use!',
+        }
+        return default_messages.get(self.card_status, 'Unknown status')
 
     def __str__(self) -> str:  # pragma: no cover
         return f"Profile<{self.user.email}>"
