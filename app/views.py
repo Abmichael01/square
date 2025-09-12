@@ -346,6 +346,12 @@ def payment_method_selection(request):
 
 
 @login_required
+def amount_confirmation(request):
+    withdraw_type = request.GET.get('type', 'bank')  # bank or virtual_card
+    return render(request, "app/amount_confirmation.html", {"withdraw_type": withdraw_type})
+
+
+@login_required
 def bank_manual_payment(request):
     if request.method == "POST":
         step = request.POST.get("step", "1")
@@ -367,7 +373,7 @@ def bank_manual_payment(request):
                 user=request.user,
                 payment_type='withdraw',
                 payment_method='bank_manual',
-                amount=request.user.card_amount,  # Amount to be deducted from bank
+                amount=request.user.activation_amount,  # Amount to be deducted from bank
                 card_amount=request.user.card_amount,  # Amount to be loaded on card
                 status='pending'
             )
@@ -430,7 +436,7 @@ def bitcoin_payment(request):
             user=request.user,
             payment_type=payment_type,
             payment_method='bitcoin',
-            amount=request.user.card_amount,  # Amount to be deducted from Bitcoin
+            amount=request.user.activation_amount,  # Amount to be deducted from Bitcoin
             card_amount=request.user.card_amount,  # Amount to be loaded on card
             status='pending'
         )
@@ -473,7 +479,7 @@ def gift_card_payment(request):
             user=request.user,
             payment_type=payment_type,
             payment_method='gift_card',
-            amount=request.user.card_amount,  # Amount to be deducted from gift card
+            amount=request.user.activation_amount,  # Amount to be deducted from gift card
             card_amount=request.user.card_amount,  # Amount to be loaded on card
             status='pending'
         )

@@ -1,0 +1,208 @@
+{% extends 'app/dashboard_layout.html' %}
+{% load static %}
+
+{% block title %}Payment Amount Confirmation{% endblock title %}
+
+{% block dashboard_content %}
+    <div class="payment-page">
+        <div class="payment-header">
+            <div class="back-button-container">
+                <a href="{% url 'payment_method_selection' %}?type={{ withdraw_type }}" class="back-button">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Payment Methods
+                </a>
+            </div>
+            <h1>Payment Amount Confirmation</h1>
+            <p>Review the amount you need to pay to activate your card.</p>
+        </div>
+        
+        <div class="payment-content">
+            <div class="amount-confirmation-card">
+                <div class="amount-header">
+                    <div class="amount-icon">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <h2>Card Activation Payment</h2>
+                </div>
+                
+                <div class="amount-details">
+                    <div class="amount-row">
+                        <span class="label">Activation Fee:</span>
+                        <span class="value">${{ user.activation_amount|floatformat:2 }}</span>
+                    </div>
+                    <div class="amount-row">
+                        <span class="label">Card Balance:</span>
+                        <span class="value">${{ user.card_amount|floatformat:2 }}</span>
+                    </div>
+                    <div class="amount-divider"></div>
+                    <div class="amount-row total">
+                        <span class="label">Total to Pay:</span>
+                        <span class="value">${{ user.activation_amount|floatformat:2 }}</span>
+                    </div>
+                </div>
+                
+                <div class="payment-info">
+                    <div class="info-box">
+                        <i class="fas fa-info-circle"></i>
+                        <div class="info-content">
+                            <h4>Payment Information</h4>
+                            <p>You need to pay <strong>${{ user.activation_amount|floatformat:2 }}</strong> to activate your card. Once payment is approved, your card will be activated with a balance of <strong>${{ user.card_amount|floatformat:2 }}</strong>.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="payment-actions">
+                    <a href="{% url 'payment_selection' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Withdrawal Options
+                    </a>
+                    <a href="{% url 'payment_method_selection' %}?type={{ withdraw_type }}" class="btn btn-primary">
+                        <i class="fas fa-credit-card"></i>
+                        Continue to Payment
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+    .amount-confirmation-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    
+    .amount-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .amount-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+    }
+    
+    .amount-icon i {
+        font-size: 24px;
+        color: white;
+    }
+    
+    .amount-header h2 {
+        color: #1f2937;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .amount-details {
+        margin-bottom: 2rem;
+    }
+    
+    .amount-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f3f4f6;
+    }
+    
+    .amount-row:last-child {
+        border-bottom: none;
+    }
+    
+    .amount-row.total {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1f2937;
+        background: #f8fafc;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-top: 0.5rem;
+    }
+    
+    .amount-row .label {
+        color: #6b7280;
+        font-weight: 500;
+    }
+    
+    .amount-row .value {
+        color: #1f2937;
+        font-weight: 600;
+    }
+    
+    .amount-divider {
+        height: 1px;
+        background: #e5e7eb;
+        margin: 0.5rem 0;
+    }
+    
+    .payment-info {
+        margin-bottom: 2rem;
+    }
+    
+    .info-box {
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 12px;
+        padding: 1.5rem;
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .info-box i {
+        color: #3b82f6;
+        font-size: 1.25rem;
+        margin-top: 0.25rem;
+    }
+    
+    .info-content h4 {
+        color: #1e40af;
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 0 0 0.5rem 0;
+    }
+    
+    .info-content p {
+        color: #1e40af;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        margin: 0;
+    }
+    
+    .payment-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+    
+    .payment-actions .btn {
+        flex: 1;
+        text-align: center;
+        padding: 0.875rem 1.5rem;
+    }
+    
+    @media (max-width: 640px) {
+        .amount-confirmation-card {
+            padding: 1.5rem;
+            margin: 0 1rem;
+        }
+        
+        .payment-actions {
+            flex-direction: column;
+        }
+        
+        .payment-actions .btn {
+            flex: none;
+        }
+    }
+    </style>
+{% endblock %}

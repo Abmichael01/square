@@ -36,6 +36,7 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     card_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # Amount to be loaded on card
+    activation_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # Amount user needs to pay to activate card
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)

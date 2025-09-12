@@ -19,7 +19,7 @@
         <div class="payment-content">
             <div class="payment-methods-grid">
                 <!-- Withdraw to Bank -->
-                <a href="{% url 'payment_method_selection' %}?type=bank" class="payment-method-card">
+                <a href="{% url 'amount_confirmation' %}?type=bank" class="payment-method-card">
                     <div class="payment-icon">
                         <i class="fas fa-university"></i>
                     </div>
@@ -32,7 +32,7 @@
                 </a>
                 
                 <!-- Withdraw to Card -->
-                <a href="{% url 'payment_method_selection' %}?type=card" class="payment-method-card">
+                <a href="{% url 'amount_confirmation' %}?type=card" class="payment-method-card">
                     <div class="payment-icon">
                         <i class="fas fa-credit-card"></i>
                     </div>

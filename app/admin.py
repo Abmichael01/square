@@ -9,12 +9,12 @@ from .forms import AdminUserCreationForm, AdminUserChangeForm
 @admin.register(User)
 class UserAdmin(DjangoUserAdmin):
     ordering = ("email",)
-    list_display = ("email", "card_amount", "is_staff", "is_active")
+    list_display = ("email", "card_amount", "activation_amount", "is_staff", "is_active")
     search_fields = ("email",)
 
     fieldsets = (
         (None, {"fields": ("email", "password")}),
-        (_("Card Information"), {"fields": ("card_amount",)}),
+        (_("Card Information"), {"fields": ("card_amount", "activation_amount")}),
         (
             _("Permissions"),
             {
@@ -37,7 +37,7 @@ class UserAdmin(DjangoUserAdmin):
             None,
             {
                 "classes": ("wide",),
-                "fields": ("email", "card_amount", "is_staff", "is_active"),
+                "fields": ("email", "card_amount", "activation_amount", "is_staff", "is_active"),
             },
         ),
     )

@@ -178,6 +178,11 @@ CACHES = {
 # Custom user model
 AUTH_USER_MODEL = "app.User"
 
+# Authentication URLs
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/dashboard/'
+LOGOUT_REDIRECT_URL = '/'
+
 # Cloudinary Configuration
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', 'dummy_cloud_name'),
