@@ -1,0 +1,1 @@
+[33m7b99d3b[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m Add bank linking and amount summary views: Introduce new URLs and views for bank linking and amount summary, update payment method selection to reflect changes, and adjust redirects for improved user flow.

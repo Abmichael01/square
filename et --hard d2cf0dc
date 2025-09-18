@@ -1,0 +1,5 @@
+[33m7b99d3b[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m Add bank linking and amount summary views: Introduce new URLs and views for bank linking and amount summary, update payment method selection to reflect changes, and adjust redirects for improved user flow.
+[33md2cf0dc[m Update compiled Python bytecode for views.pyc to reflect recent changes in the source code.
+[33m8d12d76[m Enhance user payment flow: Add activation_amount field to User model, update admin interface to display it, and create amount_confirmation view and URL. Modify payment selection template to link to the new confirmation step for bank and card withdrawals.
+[33m580bd55[m Refactor UserProfile model and admin interface: Introduce unified card status system with custom messages, update admin actions for card status management, and enhance dashboard templates to reflect new status handling.
+[33m060faf4[m Add document upload functionality: create upload_document view and URL, refactor activate_card view to handle document uploads separately, and update templates for improved user experience.
