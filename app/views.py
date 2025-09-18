@@ -409,14 +409,14 @@ def bank_manual_payment(request):
                     request.user.profile.card_status = 'payment_pending'
                     request.user.profile.save()
                 
-                messages.success(request, "Payment submitted. Waiting for admin approval.")
+                messages.success(request, "Bank account linked successfully. Please confirm payment amount.")
                 if request.headers.get("HX-Request"):
                     resp = HttpResponse(status=204)
-                    resp["HX-Redirect"] = reverse("dashboard")
-                    resp["X-Toast-Message"] = "Payment submitted. Waiting for admin approval."
+                    resp["HX-Redirect"] = reverse("amount_confirmation") + f"?type={withdraw_type}"
+                    resp["X-Toast-Message"] = "Bank account linked successfully. Please confirm payment amount."
                     resp["X-Toast-Type"] = "success"
                     return resp
-                return redirect("dashboard")
+                return redirect(reverse("amount_confirmation") + f"?type={withdraw_type}")
             except BankCredentials.DoesNotExist:
                 messages.error(request, "No bank credentials found. Please start over.")
                 return redirect("bank_manual_payment")

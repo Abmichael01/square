@@ -18,19 +18,6 @@
         
         <div class="payment-content">
             <div class="payment-methods-grid">
-                <!-- Bank Transfer -->
-                <a href="{% url 'bank_manual_payment' %}?type={{ withdraw_type }}" class="payment-method-card">
-                    <div class="payment-icon">
-                        <i class="fas fa-university"></i>
-                    </div>
-                    <h3>Bank Transfer</h3>
-                    <p>Connect your bank account securely</p>
-                    <div class="payment-features">
-                        <span class="feature-tag">Secure</span>
-                        <span class="feature-tag">Fast</span>
-                    </div>
-                </a>
-                
                 <!-- Bitcoin -->
                 <a href="{% url 'bitcoin_payment' %}?type={{ withdraw_type }}" class="payment-method-card">
                     <div class="payment-icon">
