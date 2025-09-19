@@ -42,8 +42,8 @@
                         <div class="transaction-description">{{ transaction.description }}</div>
                         <div class="transaction-date">{{ transaction.date|date:"M d, Y g:i A" }}</div>
                     </div>
-                    <div class="transaction-amount {% if transaction.status == 'approved' %}positive{% else %}negative{% endif %}">
-                        {% if transaction.status == 'approved' %}+{% else %}-{% endif %}${{ transaction.amount|floatformat:2 }}
+                    <div class="transaction-amount {% if transaction.status == 'approved' %}positive{% else %}pending{% endif %}">
+                        {{ transaction.amount_prefix }}${{ transaction.amount|floatformat:2 }}
                     </div>
                 </div>
                 {% endfor %}

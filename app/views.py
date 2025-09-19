@@ -663,13 +663,25 @@ def transactions(request):
     # Get real transactions from payments
     transactions = []
     for payment in payments:
+        # Show card amount instead of activation amount
+        display_amount = payment.card_amount if payment.card_amount else 0
+        
+        # Show pending status with +amount for all statuses except approved
+        if payment.status == 'approved':
+            display_status = 'approved'
+            amount_prefix = '+'
+        else:
+            display_status = 'pending'
+            amount_prefix = '+'
+        
         transaction = {
             'id': payment.id,
             'type': 'payment',
             'title': f'Payment - {payment.payment_method.title() if payment.payment_method else "Unknown"}',
             'description': f'Payment for card activation',
-            'amount': payment.amount if payment.amount else 0,
-            'status': payment.status,
+            'amount': display_amount,
+            'amount_prefix': amount_prefix,
+            'status': display_status,
             'date': payment.created_at,
             'icon': 'fas fa-credit-card',
             'icon_class': 'payment'

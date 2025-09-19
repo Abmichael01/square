@@ -163,6 +163,10 @@
     color: #dc2626;
 }
 
+.transaction-amount.pending {
+    color: #d97706;
+}
+
 /* No Transactions State */
 .no-transactions {
     text-align: center;
