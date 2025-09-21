@@ -130,8 +130,11 @@ dmypy.json
 
 # Django specific
 staticfiles/
+staticfiles_build/
 media/
 sent_emails/
 
 # Vercel
 .vercel
+
+.htaccess

@@ -35,6 +35,8 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     '.vercel.app',
     '.now.sh',
+    'squarepr.site',
+    
     # Add your custom domain here
 ]
 
@@ -93,13 +95,33 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Parse database URL from environment variable
 import dj_database_url
 
-DATABASES = {
-    "default": dj_database_url.parse(
-        os.getenv('DATABASE_URL', 'sqlite:///db.sqlite3'),
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
-}
+# Check environment to determine database configuration
+ENV = os.getenv('ENV', 'development')
+
+if ENV == 'development':
+    # Development: Use DATABASE_URL from environment
+    DATABASES = {
+        "default": dj_database_url.parse(
+            os.getenv('DATABASE_URL', 'sqlite:///db.sqlite3'),
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
+else:
+    # Production: Use manual PostgreSQL configuration
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DB_NAME', 'damibrother'),
+            'USER': os.getenv('DB_USER', 'postgres'),
+            'PASSWORD': os.getenv('DB_PASSWORD', ''),
+            'HOST': os.getenv('DB_HOST', 'localhost'),
+            'PORT': os.getenv('DB_PORT', '5432'),
+            'OPTIONS': {
+                'sslmode': 'require',
+            },
+        }
+    }
 
 
 # Password validation
