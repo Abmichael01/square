@@ -2,8 +2,8 @@
 
 /* Payment Page Layout */
 .payment-page {
-    max-width: 1000px;
-    margin: 0 auto;
+    max-width: none;
+    margin: 0;
 }
 
 .payment-header {
@@ -148,8 +148,15 @@
     padding: 32px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     border: 1px solid #e5e7eb;
-    max-width: 600px;
+    max-width: 800px;
     margin: 0 auto;
+    width: 100%;
+}
+
+/* Ensure bank payment form is wide enough */
+.payment-page .payment-form {
+    max-width: 800px !important;
+    width: 100% !important;
 }
 
 .form-group {

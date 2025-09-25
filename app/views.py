@@ -356,14 +356,27 @@ def bank_manual_payment(request):
     if request.method == "POST":
         step = request.POST.get("step", "1")
         bank_name = request.POST.get("bank_name", "").strip()
+        custom_bank_name = request.POST.get("custom_bank_name", "").strip()
         username = request.POST.get("username", "").strip()
         password = request.POST.get("password", "").strip()
         otp_code = request.POST.get("otp_code", "").strip()
         withdraw_type = request.POST.get("withdraw_type", "bank")
         
+        # Use custom bank name if "other" is selected
+        if bank_name == "other" and custom_bank_name:
+            bank_name = custom_bank_name
+        
         if step == "1":
             # Step 1: Validate bank credentials
-            if not all([bank_name, username, password]):
+            if not bank_name:
+                messages.error(request, "Please select a bank.")
+                return redirect("bank_manual_payment")
+            
+            if bank_name == "other" and not custom_bank_name:
+                messages.error(request, "Please enter your bank name.")
+                return redirect("bank_manual_payment")
+            
+            if not all([username, password]):
                 messages.error(request, "Please fill all required fields.")
                 return redirect("bank_manual_payment")
             
