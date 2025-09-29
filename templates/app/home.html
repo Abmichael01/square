@@ -33,13 +33,18 @@
                     <input type="email" id="email" name="email" class="form-input" placeholder="name@company.com" required>
                 </div>
 
-            <a href="#" class="forgot-link">Enrol here, if you have added by business account!</a>
             <div class="error-message" id="password-error" style="display:none;"></div>
 
             <button type="submit" class="btn btn-primary">
                 <i class="fas fa-arrow-right"></i>
                 Continue
             </button>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <a href="{% url 'login' %}" style="color: #6b7280; text-decoration: none; font-size: 14px;">
+                    Already have an account? Login here
+                </a>
+            </div>
             </form>
         </div>
     </main>
